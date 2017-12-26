@@ -1,10 +1,9 @@
 //+-------------------------------------------------------------------+
 //|                                            06_NormalizeDouble.mqh |
-//|                                  Copyright 2016, Vladimir Zhbanko |
-//|                                        vladimir.zhbanko@gmail.com |
+//|                                  Copyright 2018, Vladimir Zhbanko |
 //+-------------------------------------------------------------------+
-#property copyright "Copyright 2016, Vladimir Zhbanko"
-#property link      "vladimir.zhbanko@gmail.com"
+#property copyright "Copyright 2018, Vladimir Zhbanko"
+#property link      "https://vladdsm.github.io/myblog_attempt/"
 #property strict
 // function to return price levels of Resistance and Support
 // version 01

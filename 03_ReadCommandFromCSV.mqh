@@ -1,10 +1,9 @@
 //+-------------------------------------------------------------------+
 //|                                         03_ReadCommandFromCSV.mqh |
-//|                                  Copyright 2016, Vladimir Zhbanko |
-//|                                        vladimir.zhbanko@gmail.com |
+//|                                  Copyright 2018, Vladimir Zhbanko |
 //+-------------------------------------------------------------------+
-#property copyright "Copyright 2016, Vladimir Zhbanko"
-#property link      "vladimir.zhbanko@gmail.com"
+#property copyright "Copyright 2018, Vladimir Zhbanko"
+#property link      "https://vladdsm.github.io/myblog_attempt/"
 #property strict
 // function to recieve command to trade from csv
 // version 01 date 1.08.2016

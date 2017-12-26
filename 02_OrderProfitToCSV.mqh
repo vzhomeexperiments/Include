@@ -1,10 +1,9 @@
 //+-------------------------------------------------------------------+
 //|                                           02_OrderProfitToCSV.mqh |
-//|                                  Copyright 2016, Vladimir Zhbanko |
-//|                                        vladimir.zhbanko@gmail.com |
+//|                                  Copyright 2018, Vladimir Zhbanko |
 //+-------------------------------------------------------------------+
-#property copyright "Copyright 2016, Vladimir Zhbanko"
-#property link      "vladimir.zhbanko@gmail.com"
+#property copyright "Copyright 2018, Vladimir Zhbanko"
+#property link      "https://vladdsm.github.io/myblog_attempt/"
 #property strict
 // function to write order profits to csv using EA
 // version 01
@@ -26,6 +25,7 @@ User guide:
 void OrderProfitToCSV(int terminalNumber)
 {
    //*3*_Logging closed orders to the file csv for further order management in R
+    int MagicNumber;
     int  tickets[], nTickets = GetHistoryOrderByCloseTime(tickets, MagicNumber);  // this define dyn. array with tickets, gets ticket num in history
     static int prevAmountTickets = 0;       // variable used for order history logging
     

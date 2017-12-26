@@ -1,10 +1,9 @@
 //+-------------------------------------------------------------------+
 //|                                             08_TerminalNumber.mqh |
-//|                                  Copyright 2016, Vladimir Zhbanko |
-//|                                        vladimir.zhbanko@gmail.com |
+//|                                  Copyright 2018, Vladimir Zhbanko |
 //+-------------------------------------------------------------------+
-#property copyright "Copyright 2016, Vladimir Zhbanko"
-#property link      "vladimir.zhbanko@gmail.com"
+#property copyright "Copyright 2018, Vladimir Zhbanko"
+#property link      "https://vladdsm.github.io/myblog_attempt/"
 #property strict
 // function returning an integer value with Termnal Number from Magic Number
 // version 01
