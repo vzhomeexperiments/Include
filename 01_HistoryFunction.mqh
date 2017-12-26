@@ -1,14 +1,12 @@
 //+------------------------------------------------------------------+
 //|                                           01_HistoryFunction.mqh |
-//|                                 Copyright 2016, Vladimir Zhbanko |
-//|                                       vladimir.zhbanko@gmail.com |
+//|                                 Copyright 2018, Vladimir Zhbanko |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2016, Vladimir Zhbanko"
-#property link      "vladimir.zhbanko@gmail.com"
+#property copyright "Copyright 2018, Vladimir Zhbanko"
+#property link      "https://vladdsm.github.io/myblog_attempt/"
 #property strict
 // function to handle history in EA's
-// version 01
-// date 31.07.2016
+// source: https://www.mql5.com/en/forum/138127
 
 //+---------------------------------------------------+//
 //Function returning n of orders in history            //
