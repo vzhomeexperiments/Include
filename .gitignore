@@ -1,0 +1,15 @@
+04_SupportResistanceLevels.mqh
+05_MarketInfoLogger.mqh
+07_GetMarketType.mqh
+09_MarketType.mqh
+090_MarketType.mqh
+091_MarketType.mqh
+092_MarketType.mqh
+093_MarketType.mqh
+094_MarketType.mqh
+MovingAverages.mqh
+Object.mqh
+stderror.mqh
+stdlib.mqh
+StdLibErr.mqh
+WinUser32.mqh
