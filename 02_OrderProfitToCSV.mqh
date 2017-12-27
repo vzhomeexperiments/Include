@@ -25,7 +25,7 @@ User guide:
 void OrderProfitToCSV(int terminalNumber)
 {
    //*3*_Logging closed orders to the file csv for further order management in R
-    int MagicNumber;
+    
     int  tickets[], nTickets = GetHistoryOrderByCloseTime(tickets, MagicNumber);  // this define dyn. array with tickets, gets ticket num in history
     static int prevAmountTickets = 0;       // variable used for order history logging
     
