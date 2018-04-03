@@ -20,7 +20,7 @@ Function is returning TRUE if it's a new bar start
 
 User guide:
 1. #include this file to the folder Include
-
+2. add code in the beginning of the Start function: if(!isNewBar())return(0);
 */
 
 //+------------------------------------------------------------------+
