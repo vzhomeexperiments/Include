@@ -22,3 +22,11 @@ It will only copy files with specific extension and only overwrite in case files
 1. To synchronize MT4 Development Terminal Folder to Version Control Repository: launch *_PullFromMT4.bat*
 2. To deploy reverted changes from Version Control to Development Terminal: launch *_PushToMT4Dev.bat*
 3. To deploy reverted changes from Version Control to All Terminals: launch *_PushToMT4Prod*
+
+## Courious how to apply?
+
+Join these UDEMY courses with a tremendious discount!
+
+* https://www.udemy.com/your-trading-journal/?couponCode=LAZYTRADE-GIT
+* https://www.udemy.com/your-trading-robot/?couponCode=LAZYTRADE-GIT
+* https://www.udemy.com/your-home-trading-environment/?couponCode=LAZYTRADE-GIT
