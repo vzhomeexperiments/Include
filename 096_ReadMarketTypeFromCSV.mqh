@@ -10,23 +10,13 @@
 // version 1.001 date 29.12.2017
 // version 1.002 date 15.04.2018 
 
-#define MARKET_NONE      0       //Market not siutable for trading e.g. macroeconomic event or not properly defined
-#define MARKET_BULLNOR   1       //Market with volatile bullish character
-#define MARKET_BULLVOL   2       //Market with volatile bearish character
-#define MARKET_BEARNOR   3       //Ranging Market volatile
-#define MARKET_BEARVOL   4       //Market with bullish character
-#define MARKET_RANGENOR  5       //Market with bearish character
-#define MARKET_RANGEVOL  6       //Ranging Market
-
-/*
-# Market Periods
-# 1. Bull normal, BUN
-# 2. Bull volatile, BUV
-# 3. Bear normal, BEN
-# 4. Bear volatile, BEV
-# 5. Sideways quiet, RAN
-# 6. Sideways volatile, RAV
-*/
+#define MARKET_NONE 0       //Market not siutable for trading e.g. macroeconomic event or not properly defined
+#define MARKET_BUN  1       //Market with bullish character
+#define MARKET_BUV  2       //Market with volatile bullish character
+#define MARKET_BEN  3       //Market with bearish character
+#define MARKET_BEV  4       //Market with volatile bearish character
+#define MARKET_RAN  5       //Market with Ranging character
+#define MARKET_RAV  6       //Market with volatile Ranging character
 
 //+-------------------------------------------------------------+//
 //Function requires input of the symbol 
@@ -53,20 +43,19 @@ int ReadMarketFromCSV(string symbol)
    res = ReadFile(symbol);
 
    //Assign market variable based on result
-   if(res == "0" || res == "-1"){marketType = MARKET_NONE; return(marketType); }
-   if(res == "1" || res == "BUN"){marketType = MARKET_BULLNOR; return(marketType); }
-   if(res == "2" || res == "BUV"){marketType = MARKET_BULLVOL; return(marketType); }
-   if(res == "3" || res == "BEN"){marketType = MARKET_BEARNOR; return(marketType); }
-   if(res == "4" || res == "BEV"){marketType = MARKET_BEARVOL; return(marketType); }
-   if(res == "5" || res == "RAN"){marketType = MARKET_RANGENOR; return(marketType); }
-   if(res == "6" || res == "RAV"){marketType = MARKET_RANGEVOL; return(marketType); }
+   if(res == "0" || res == "-1") {marketType = MARKET_NONE; return(marketType); }
+   if(res == "1" || res == "BUN"){marketType = MARKET_BUN;  return(marketType); }
+   if(res == "2" || res == "BUV"){marketType = MARKET_BUV;  return(marketType); }
+   if(res == "3" || res == "BEN"){marketType = MARKET_BEN;  return(marketType); }
+   if(res == "4" || res == "BEV"){marketType = MARKET_BEV;  return(marketType); }
+   if(res == "5" || res == "RAN"){marketType = MARKET_RAN;  return(marketType); }
+   if(res == "6" || res == "RAV"){marketType = MARKET_RAV;  return(marketType); }
    
    return(marketType); //in anomalous case function will return error '-1'
  
 } 
 
-
-//function
+//function that read file from sandbox and get the last character
 string ReadFile(string symbol) 
 {
 int handle;
@@ -76,12 +65,8 @@ handle=FileOpen("AI_MarketType_"+symbol+".csv",FILE_READ);
 if(handle==-1){Comment("Error - file does not exist"); str = "-1"; } 
 if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty"); }
    
-   while(!FileIsEnding(handle))
-   {
-   //this will bring the last element
-   str=FileReadString(handle);
-      
-   }
+    //this will bring the last element
+   while(!FileIsEnding(handle)) { str=FileReadString(handle);  }
    
    FileClose(handle);
    return(str);
