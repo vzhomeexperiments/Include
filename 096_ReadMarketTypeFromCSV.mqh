@@ -28,10 +28,10 @@ User guide:
 3. Adapt Trading Robot conditions to change trading strategy parameters eg.: see Falcon_C
 4. Add include call to this file  to EAe.g.:            #include <096_ReadMarketTypeFromCSV.mqh>
 */
-int ReadMarketFromCSV(string symbol)
+int ReadMarketFromCSV(string symbol, int chart_period)
 {
 /*
-- Function reads the file eg: AI_MarketType_AUDCAD.csv
+- Function reads the file eg: AI_MarketType_AUDCAD15.csv
 - It is searching either numeric code or string value containing market type information 
  
 */
@@ -40,7 +40,7 @@ int ReadMarketFromCSV(string symbol)
    string res = "0";            //Variable to return result of the function
 
    //Read the file
-   res = ReadFile(symbol);
+   res = ReadFile(symbol, chart_period);
 
    //Assign market variable based on result
    if(res == "0" || res == "-1") {marketType = MARKET_NONE; return(marketType); }
@@ -56,12 +56,12 @@ int ReadMarketFromCSV(string symbol)
 } 
 
 //function that read file from sandbox and get the last character
-string ReadFile(string symbol) 
+string ReadFile(string symbol, int chart_period) 
 {
 int handle;
 string str;
 
-handle=FileOpen("AI_MarketType_"+symbol+".csv",FILE_READ);
+handle=FileOpen("AI_MarketType_"+symbol+IntegerToString(chart_period)+".csv",FILE_READ);
 if(handle==-1){Comment("Error - file does not exist"); str = "-1"; } 
 if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty"); }
    
