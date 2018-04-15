@@ -13,3 +13,4 @@ stderror.mqh
 stdlib.mqh
 StdLibErr.mqh
 WinUser32.mqh
+Clarissa_Functions.mqh

@@ -1,14 +1,14 @@
 //+-------------------------------------------------------------------+
-//|                                         03_ReadMarketFromCSV.mqh |
+//|                                     096_ReadMarketTypeFromCSV.mqh |
 //|                                  Copyright 2018, Vladimir Zhbanko |
 //+-------------------------------------------------------------------+
 #property copyright "Copyright 2018, Vladimir Zhbanko"
 #property link      "https://vladdsm.github.io/myblog_attempt/"
-#property version   "1.001"  
+#property version   "1.002"  
 #property strict
 // function to recieve market type from csv
 // version 1.001 date 29.12.2017
-// version 02 
+// version 1.002 date 15.04.2018 
 
 #define MARKET_NONE      0       //Market not siutable for trading e.g. macroeconomic event or not properly defined
 #define MARKET_BULLNOR   1       //Market with volatile bullish character
@@ -19,12 +19,13 @@
 #define MARKET_RANGEVOL  6       //Ranging Market
 
 /*
-1. Bull normal
-2. Bull volatile
-3. Bear normal
-4. Bear volatile
-5. Sideways quiet
-6. Sideways volatile
+# Market Periods
+# 1. Bull normal, BUN
+# 2. Bull volatile, BUV
+# 3. Bear normal, BEN
+# 4. Bear volatile, BEV
+# 5. Sideways quiet, RAN
+# 6. Sideways volatile, RAV
 */
 
 //+-------------------------------------------------------------+//
@@ -32,55 +33,56 @@
 //+-------------------------------------------------------------+//
 /*
 User guide:
-1. Add global bool variable to EA: e.g.:                     bool TradeAllowed = true; 
-2. Add function call inside start function to EA: e.g.: TradeAllowed = ReadCommandFromCSV(MagicNumber);
-3. Insert TradeAllowed inside condition to start trading eg.: if(TradeAllowed && TickVolume > MinVolumeTicks) { signals...}
-4. Add include call to this file  to EAe.g.:            #include <03_ReadCommandFromCSV.mqh>
+1. Add global bool variable to EA: e.g.:                     int     MyMarketType;
+2. Add function call inside start function to EA: e.g.: MyMarketType = ReadMarketFromCSV(Symbol());
+3. Adapt Trading Robot conditions to change trading strategy parameters eg.: see Falcon_C
+4. Add include call to this file  to EAe.g.:            #include <096_ReadMarketTypeFromCSV.mqh>
 */
 int ReadMarketFromCSV(string symbol)
 {
 /*
-- Function reads the file AI_SystemControlMagicNumber.csv
-- It is searching the code 1 and return trade as enabled 
+- Function reads the file eg: AI_MarketType_AUDCAD.csv
+- It is searching either numeric code or string value containing market type information 
  
 */
    //define internal variables needed
-   int marketType = 0;     //Variable to store and return the market type
-   int res = 0;            //Variable to return result of the function
+   int marketType = -1;         //Variable to store and return the market type
+   string res = "0";            //Variable to return result of the function
 
    //Read the file
    res = ReadFile(symbol);
 
    //Assign market variable based on result
-   if(res == 0 || res == -1){marketType = MARKET_NONE; return(marketType); }
-   if(res == 1){marketType = MARKET_BULLNOR; return(marketType); }
-   if(res == 2){marketType = MARKET_BULLVOL; return(marketType); }
-   if(res == 3){marketType = MARKET_BEARNOR; return(marketType); }
-   if(res == 4){marketType = MARKET_BEARVOL; return(marketType); }
-   if(res == 5){marketType = MARKET_RANGENOR; return(marketType); }
-   if(res == 6){marketType = MARKET_RANGEVOL; return(marketType); }
- return(marketType);
+   if(res == "0" || res == "-1"){marketType = MARKET_NONE; return(marketType); }
+   if(res == "1" || res == "BUN"){marketType = MARKET_BULLNOR; return(marketType); }
+   if(res == "2" || res == "BUV"){marketType = MARKET_BULLVOL; return(marketType); }
+   if(res == "3" || res == "BEN"){marketType = MARKET_BEARNOR; return(marketType); }
+   if(res == "4" || res == "BEV"){marketType = MARKET_BEARVOL; return(marketType); }
+   if(res == "5" || res == "RAN"){marketType = MARKET_RANGENOR; return(marketType); }
+   if(res == "6" || res == "RAV"){marketType = MARKET_RANGEVOL; return(marketType); }
+   
+   return(marketType); //in anomalous case function will return error '-1'
  
 } 
 
 
 //function
-int ReadFile(string symbol) 
+string ReadFile(string symbol) 
 {
-int handle, el1 = 0;
+int handle;
 string str;
 
 handle=FileOpen("AI_MarketType_"+symbol+".csv",FILE_READ);
-if(handle==-1){Comment("Error - file does not exist"); el1 = 0; } 
+if(handle==-1){Comment("Error - file does not exist"); str = "-1"; } 
 if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty"); }
    
    while(!FileIsEnding(handle))
    {
+   //this will bring the last element
    str=FileReadString(handle);
-   el1 = (int)str;
-   
+      
    }
    
    FileClose(handle);
-   return(el1);
+   return(str);
 }
