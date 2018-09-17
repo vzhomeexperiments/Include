@@ -76,8 +76,8 @@ if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty");  }
       if(elem1 == mt_val)
         {
           // analyse the second element [policy], convert to boolean and return the result
-          if(elem2 == "ON")  MTPolicyIsOn = True;  return(MTPolicyIsOn);
-          if(elem2 == "OFF") MTPolicyIsOn = False; return(MTPolicyIsOn);
+          if(elem2 == "ON")  MTPolicyIsOn = True;  FileClose(handle); return(MTPolicyIsOn);
+          if(elem2 == "OFF") MTPolicyIsOn = False; FileClose(handle); return(MTPolicyIsOn);
         }
   
    }
