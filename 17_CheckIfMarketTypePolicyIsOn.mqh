@@ -33,7 +33,7 @@ bool CheckIfMarketTypePolicyIsOn(int Magic, int MT)
 //Declaring variables
 int handle;      
 bool MTPolicyIsOn = False;
-string str, word1, word2, mt_val;
+string str, mt_val;
 string sep=",";                // A separator as a character 
 ushort u_sep;    // The code of the separator character 
 string full_line, elem1, elem2;
@@ -76,8 +76,8 @@ if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty");  }
       if(elem1 == mt_val)
         {
           // analyse the second element [policy], convert to boolean and return the result
-          if(elem2 == "ON")  MTPolicyIsOn = True;  FileClose(handle); return(MTPolicyIsOn);
-          if(elem2 == "OFF") MTPolicyIsOn = False; FileClose(handle); return(MTPolicyIsOn);
+          if(elem2 == "ON")  MTPolicyIsOn = True;  
+          if(elem2 == "OFF") MTPolicyIsOn = False; 
         }
   
    }
