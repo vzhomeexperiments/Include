@@ -38,6 +38,7 @@ int ReadMarketFromCSV(string symbol, int chart_period)
    //define internal variables needed
    int marketType = -1;         //Variable to store and return the market type
    string res = "0";            //Variable to return result of the function
+   
 
    //Read the file
    res = ReadFile(symbol, chart_period);
@@ -59,15 +60,44 @@ int ReadMarketFromCSV(string symbol, int chart_period)
 string ReadFile(string symbol, int chart_period) 
 {
 int handle;
+string output;
 string str;
+string sep=",";              // A separator as a character 
+ushort u_sep;                // The code of the separator character 
+string result[];             // An array to get string elements
+string full_line;            // String reserved for a file string
 
 handle=FileOpen("AI_MarketType_"+symbol+IntegerToString(chart_period)+".csv",FILE_READ);
 if(handle==-1){Comment("Error - file does not exist"); str = "-1"; } 
 if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty"); }
    
     //this will bring the last element
-   while(!FileIsEnding(handle)) { str=FileReadString(handle);  }
+   while(!FileIsEnding(handle)) { 
+   
+   str=FileReadString(handle); //storing content of the current line
+         
+            //full current line
+            full_line = StringSubstr(str,0);
+            //--- Get the separator code 
+            u_sep=StringGetCharacter(sep,0); 
+            //--- Split the string to substrings and store to the array result[] 
+            int k = StringSplit(str,u_sep,result); 
+            // extract content of the string array [for better clarify]
+   }
    
    FileClose(handle);
-   return(str);
+   
+         if(result[0] == "-1"){output = str; return(output); } //in anomalous case function will return error '-1'
+         else if(result[0] == "BUN" ||
+                 result[0] == "BUV" ||
+                 result[0] == "BEN" ||
+                 result[0] == "BEV" ||
+                 result[0] == "RAN" ||
+                 result[0] == "RAV") output = result[0];
+      
+      //tested pass: 
+   
+   
+   
+   return(output);
 }

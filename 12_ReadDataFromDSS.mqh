@@ -9,9 +9,9 @@
 // function to recieve information from csv files
 // version 1.001 date 05.09.2020
 //
-//+-------------------------------------------------------------------------+//
-//Universal function to read different files from the Decision Support System//
-//+-------------------------------------------------------------------------+//
+//+---------------------------------------------------------------------------------+//
+//Universal function to read different numeric files from the Decision Support System//
+//+---------------------------------------------------------------------------------+//
 /*
 
 
@@ -32,6 +32,7 @@ mode = "read_change"    read predicted price change
 mode = "read_trigger"   read optimal trigger value
 mode = "read_timehold"  read optimal time hold in hour bars
 mode = "read_maxperf"   read achieved model performance value
+mode = "read_mt_conf"   read confidence value of market type prediction
 
 */
 double ReadDataFromDSS(string symbol, int chart_period, string mode)
@@ -126,6 +127,47 @@ double ReadDataFromDSS(string symbol, int chart_period, string mode)
       
       
      }
+     
+   if(mode == "read_mt_conf")
+     {
+      
+      f_name = "AI_MarketType_";
+      
+      
+         handle=FileOpen(f_name+symbol+IntegerToString(chart_period)+".csv",FILE_READ|FILE_CSV,"@");
+      if(handle==-1){Comment("Error - file does not exist"); str = "-1"; } 
+      if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty"); }
+         
+       // analyse the content of each string line by line
+      while(!FileIsEnding(handle))
+      {
+            str=FileReadString(handle); //storing content of the current line
+         
+            //full current line
+            full_line = StringSubstr(str,0);
+            //--- Get the separator code 
+            u_sep=StringGetCharacter(sep,0); 
+            //--- Split the string to substrings and store to the array result[] 
+            int k = StringSplit(str,u_sep,result); 
+            // extract content of the string array [for better clarify]
+            
+              
+   
+      }
+      FileClose(handle);
+      
+         if(result[0] == "-1"){output = StringToDouble(str); return(output); } //in anomalous case function will return error '-1'
+         else if(result[0] == "BUN" ||
+                 result[0] == "BUV" ||
+                 result[0] == "BEN" ||
+                 result[0] == "BEV" ||
+                 result[0] == "RAN" ||
+                 result[0] == "RAV") output = StringToDouble(result[1]);
+      
+      //tested pass: Ok
+      
+      
+     }  
    
    
       
