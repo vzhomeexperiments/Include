@@ -2,7 +2,7 @@
 //|                                           02_OrderProfitToCSV.mqh |
 //|                                  Copyright 2018, Vladimir Zhbanko |
 //+-------------------------------------------------------------------+
-#property copyright "Copyright 2018, Vladimir Zhbanko"
+#property copyright "Copyright 2020, Vladimir Zhbanko"
 #property link      "https://vladdsm.github.io/myblog_attempt/"
 #property strict
 // function to write order profits to csv using EA
@@ -10,8 +10,7 @@
 // date 31.07.2016
 // version 02 - added order symbol for ticket
 // date 25.12.2016
-
-
+// version 03 - added function DoubleToString
 //+-------------------------------------------------------------+//
 //Function requires just input of the trade terminal number      //
 //+-------------------------------------------------------------+//
@@ -25,7 +24,6 @@ User guide:
 void OrderProfitToCSV(int terminalNumber)
 {
    //*3*_Logging closed orders to the file csv for further order management in R
-    
     int  tickets[], nTickets = GetHistoryOrderByCloseTime(tickets, MagicNumber);  // this define dyn. array with tickets, gets ticket num in history
     static int prevAmountTickets = 0;       // variable used for order history logging
     
@@ -47,7 +45,7 @@ void OrderProfitToCSV(int terminalNumber)
                  int handle = FileOpen(fileName,FILE_CSV|FILE_READ|FILE_WRITE);
                               FileSeek(handle,0,SEEK_END);
                  string data = string(MagicNumber) + "," + string(ordTicket) + "," + string(ordOT) + "," + string(ordCT) + ","
-                 + string(profit)+ ","+ordPair+","+string(ordTyp);
+                 + DoubleToStr(profit,2)+ ","+ordPair+","+string(ordTyp);
                  FileWrite(handle,data);   //write data to the file during each for loop iteration
                  FileClose(handle);        //close file when data write is over
          }  
