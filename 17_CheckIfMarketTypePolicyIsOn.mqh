@@ -47,13 +47,18 @@ string result[]; // An array to get strings
    if(MT == 4){mt_val = "BEV"; }
    if(MT == 5){mt_val = "RAN"; }
    if(MT == 6){mt_val = "RAV"; }
-
+/*
 // open the file   
-handle=FileOpen("SystemControlMT"+string(Magic)+".csv",FILE_READ|FILE_CSV,"@");
+handle=FileOpen("SystemControlMT"+string(Magic)+".csv",FILE_READ|FILE_SHARE_READ|FILE_CSV,"@");
 
 // fail safe mechanism
 if(handle==-1){Comment("Error - file does not exist"); MTPolicyIsOn = false; } 
 if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty");  }
+   */
+  
+            handle=0; 
+       while( handle==0 || handle==-1 ){handle = FileOpen("SystemControlMT"+string(Magic)+".csv",FILE_CSV|FILE_READ|FILE_SHARE_READ|FILE_WRITE|FILE_SHARE_WRITE);}
+   
    
    // analyse the content of each string line by line
    while(!FileIsEnding(handle))

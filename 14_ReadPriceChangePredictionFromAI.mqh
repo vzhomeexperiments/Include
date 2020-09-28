@@ -31,10 +31,15 @@ double ReadPriceChangePredictionFromAI(string symbol, int chart_period)
    string res = "0";            //Variable to return result of the function
    int handle;
    string str;
-      
-   handle=FileOpen("AI_M"+IntegerToString(chart_period)+"_Change"+symbol+".csv",FILE_READ);
+      /*
+   handle=FileOpen("AI_M"+IntegerToString(chart_period)+"_Change"+symbol+".csv",FILE_READ|FILE_SHARE_READ);
    if(handle==-1){Comment("Error - file does not exist"); str = "-1"; } 
-   if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty"); }
+   if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty"); }*/
+  
+            handle=0; 
+       while( handle==0 || handle==-1 ){handle = FileOpen("AI_M"+IntegerToString(chart_period)+"_Change"+symbol+".csv",FILE_CSV|FILE_READ|FILE_SHARE_READ|FILE_WRITE|FILE_SHARE_WRITE);}
+   
+      
       
        //this will bring the last element
       while(!FileIsEnding(handle)) { str=FileReadString(handle);  }
