@@ -47,12 +47,7 @@ string res = "-1";
    
 string fileName = "MarketTypeLog"+string(magic)+".csv";
 // open file handle
-//int handle = FileOpen(fileName,FILE_CSV|FILE_READ|FILE_SHARE_READ|FILE_WRITE|FILE_SHARE_WRITE); 
-  
-       int handle=0; 
-       while( handle==0 || handle==-1 ){handle = FileOpen(fileName,FILE_CSV|FILE_READ|FILE_SHARE_READ|FILE_WRITE|FILE_SHARE_WRITE);}
-   
-  
+int handle = FileOpen(fileName,FILE_CSV|FILE_READ|FILE_WRITE);   
              FileSeek(handle,0,SEEK_END);
 string data = string(magic) + "," + string(order) + "," + res;
 FileWrite(handle,data);   //write data to the file during each for loop iteration

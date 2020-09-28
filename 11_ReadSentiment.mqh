@@ -48,14 +48,10 @@ int ReadSentiment(string Pair, int DefaultDirection)
 {
 int handle, el1 = DefaultDirection;
 string str;
-/*
-handle=FileOpen("Sentiment_"+string(Pair)+ ".csv",FILE_READ|FILE_SHARE_READ);
+
+handle=FileOpen("Sentiment_"+string(Pair)+ ".csv",FILE_READ);
 if(handle==-1)Print("Function Read Prediction: Error - file does not exist" + string(Pair)); 
-if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty"); }*/
-  
-            handle=0; 
-       while( handle==0 || handle==-1 ){handle = FileOpen("Sentiment_"+string(Pair)+ ".csv",FILE_CSV|FILE_READ|FILE_SHARE_READ|FILE_WRITE|FILE_SHARE_WRITE);}
-   
+if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty"); }
    
    while(!FileIsEnding(handle))
    {

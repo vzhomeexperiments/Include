@@ -66,14 +66,10 @@ string sep=",";              // A separator as a character
 ushort u_sep;                // The code of the separator character 
 string result[];             // An array to get string elements
 string full_line;            // String reserved for a file string
-/*
-handle=FileOpen("AI_MarketType_"+symbol+IntegerToString(chart_period)+".csv",FILE_READ|FILE_SHARE_READ);
+
+handle=FileOpen("AI_MarketType_"+symbol+IntegerToString(chart_period)+".csv",FILE_READ);
 if(handle==-1){Comment("Error - file does not exist"); str = "-1"; } 
-if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty"); }*/
-  
-            handle=0; 
-       while( handle==0 || handle==-1 ){handle = FileOpen("AI_MarketType_"+symbol+IntegerToString(chart_period)+".csv",FILE_CSV|FILE_READ|FILE_SHARE_READ|FILE_WRITE|FILE_SHARE_WRITE);}
-   
+if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty"); }
    
     //this will bring the last element
    while(!FileIsEnding(handle)) { 
