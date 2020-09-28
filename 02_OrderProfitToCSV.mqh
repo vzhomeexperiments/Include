@@ -42,8 +42,12 @@ void OrderProfitToCSV(int terminalNumber)
                  // record info to the file csv
                  string fileName = "OrdersResultsT"+string(terminalNumber)+".csv";//create the name of the file same for all symbols...
                  // open file handle
-                 int handle = FileOpen(fileName,FILE_CSV|FILE_READ|FILE_WRITE);
-                              FileSeek(handle,0,SEEK_END);
+                /* int handle = FileOpen(fileName,FILE_CSV|FILE_READ|FILE_SHARE_READ|FILE_WRITE|FILE_SHARE_WRITE);*/
+                 int handle=0; 
+                 while( handle==0 || handle==-1 ){handle = FileOpen(fileName,FILE_CSV|FILE_READ|FILE_SHARE_READ|FILE_WRITE|FILE_SHARE_WRITE);}
+                 
+                 FileSeek(handle,0,SEEK_END);
+   
                  string data = string(MagicNumber) + "," + string(ordTicket) + "," + string(ordOT) + "," + string(ordCT) + ","
                  + DoubleToStr(profit,2)+ ","+ordPair+","+string(ordTyp);
                  FileWrite(handle,data);   //write data to the file during each for loop iteration
