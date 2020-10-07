@@ -77,7 +77,7 @@ string fileName = "MarketTypeLog"+string(magic)+".csv";
 // open file handle
 int handle = FileOpen(fileName,FILE_CSV|FILE_READ|FILE_WRITE);   
              FileSeek(handle,0,SEEK_END);
-string data = string(magic) + "," + string(order) + "," + string(markettype) + "," + IntegerToString(timetohold,0);
+string data = string(magic) + "," + string(order) + "," + string(markettype) + "," + IntegerToString(timetohold,0) + "," + res;
 FileWrite(handle,data);   //write data to the file during each for loop iteration
 FileClose(handle);        //close file when data write is over
 
