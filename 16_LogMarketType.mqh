@@ -55,3 +55,31 @@ FileClose(handle);        //close file when data write is over
 
 
 }
+
+void LogMarketTypeInfo(int magic, int order, int markettype, int timetohold)
+{
+/*
+- Function creates the file eg: MarketTypeLog8134201.csv
+- File will contain Order Number, Magic Number, MarketType and time to hold order
+*/
+string res = "-1";
+
+   //Assign market variable based on result
+   if(markettype == 0) res = "-1";
+   if(markettype == 1) res = "BUN";
+   if(markettype == 2) res = "BUV";
+   if(markettype == 3) res = "BEN";
+   if(markettype == 4) res = "BEV";
+   if(markettype == 5) res = "RAN";
+   if(markettype == 6) res = "RAV";
+   
+string fileName = "MarketTypeLog"+string(magic)+".csv";
+// open file handle
+int handle = FileOpen(fileName,FILE_CSV|FILE_READ|FILE_WRITE);   
+             FileSeek(handle,0,SEEK_END);
+string data = string(magic) + "," + string(order) + "," + string(markettype) + "," + IntegerToString(timetohold,0) + "," + res;
+FileWrite(handle,data);   //write data to the file during each for loop iteration
+FileClose(handle);        //close file when data write is over
+
+
+}

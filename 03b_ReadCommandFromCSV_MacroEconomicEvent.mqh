@@ -44,9 +44,6 @@ static int el2 = 0; // added ver.02
 
 string str, word, trigger;
 
-handle=FileOpen("01_MacroeconomicEvent.csv",FILE_READ);
-if(handle==-1){Alert("Error - file does not exist"); TradePossible = TRUE; } 
-if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty");  }
 
    while(!FileIsEnding(handle) && TradePossible == FALSE)
    {
