@@ -33,6 +33,7 @@ mode = "read_trigger"   read optimal trigger value
 mode = "read_timehold"  read optimal time hold in hour bars
 mode = "read_maxperf"   read achieved model performance value
 mode = "read_mt_conf"   read confidence value of market type prediction
+mode = "read_quantile"  read first quantile from all model performances
 
 */
 double ReadDataFromDSS(string symbol, int chart_period, string mode)
@@ -82,7 +83,7 @@ double ReadDataFromDSS(string symbol, int chart_period, string mode)
      }
    
    
-   if(mode == "read_trigger" || mode == "read_timehold" || mode == "read_maxperf")
+   if(mode == "read_trigger" || mode == "read_timehold" || mode == "read_maxperf" || mode == "read_quantile")
      {
       f_name = "StrTest-";
          
@@ -122,6 +123,11 @@ double ReadDataFromDSS(string symbol, int chart_period, string mode)
         {
          if(result[3] == "-1"){output = StringToDouble(str); return(output); } //in anomalous case function will return error '-1'
          else output = StringToDouble(result[3]);
+        }
+      else if(mode == "read_quantile") // test passed? OK  ;
+        {
+         if(result[4] == "-1"){output = StringToDouble(str); return(output); } //in anomalous case function will return error '-1'
+         else output = StringToDouble(result[4]);
         }
        
       
