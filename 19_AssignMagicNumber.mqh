@@ -16,45 +16,92 @@
 @description: Automatically assign magic number based on the symbol used and main strategy magic number
 @purpose: Quicker deploy of the trading robots with predictable order management
 @param symbol - string with a symbol
-@param magic - int with a 7 digit magic number 
+@param strat - int with a 2 digit strategy number 
 @guide:
-1. Use function in the first line of the init function e.g.:  MagicNumber = AssignMagicNumber(Symbol(), MagicNumber);
+1. Define external variable StrategyNumber = 11;
+2. Use function in the first line of the init function e.g.:  MagicNumber = AssignMagicNumber(Symbol(), StrategyNumber);
 */
-int AssignMagicNumber(string symbol, int magic)
+/*
+Magic number codification :
+Digit 1 : current year digit
+Digit 2 : type (1= live account ; 2 : demo account ; 3 : contest) 
+Digit 3-4 : strategy ID
+Digit 5 : Terminal number
+Digit 6-7 : Pair ID
+*/
+
+#include <08_TerminalNumber.mqh>
+
+int AssignMagicNumber(string symbol, string strat)
 {
 /*
 - 
 - 
- 
 */
 //define internal variables needed
 string Core28Pairs[] = {"AUDCAD","AUDCHF","AUDJPY","AUDNZD","AUDUSD","CADCHF","CADJPY","CHFJPY","EURAUD","EURCAD","EURCHF","EURGBP","EURJPY","EURNZD","EURUSD","GBPAUD","GBPCAD","GBPCHF","GBPJPY","GBPNZD","GBPUSD","NZDCAD","NZDCHF","NZDJPY","NZDUSD","USDCAD","USDCHF","USDJPY"};
 int result;
-string tempString1, tempString2;
+string year, digit6_7;
 
-//extract 5 left elements of the magic number
-tempString1 = string(magic);               //convert to string
-tempString1=StringSubstr(tempString1,0,StringLen(tempString1)-2);  //substract 3rd element from right
-//Comment(tempString1);
-   
+//=============================
+// Digit 1 : current year digit
+//=============================
+year = (string)Year();
+year = StringSubstr(year, 3, 1);
+
+//=============================
+// Digit 2 : type (1= live account ; 2 : demo account ; 3 : contest) 
+//=============================
+ENUM_ACCOUNT_TRADE_MODE account_type=(ENUM_ACCOUNT_TRADE_MODE)AccountInfoInteger(ACCOUNT_TRADE_MODE); 
+
+   string digit2; 
+   switch(account_type) 
+     { 
+      case  ACCOUNT_TRADE_MODE_DEMO: 
+         digit2 ="2"; 
+         break; 
+      case  ACCOUNT_TRADE_MODE_CONTEST: 
+         digit2 ="3"; 
+         break; 
+      default: 
+         digit2 ="1"; 
+         break; 
+     } 
+
+//=============================
+//Digit 3-4 : strategy ID
+//=============================
+//Strategy
+string digit3_4 = strat;
+
+//=============================
+//Digit 5 : Terminal number
+//=============================
+string digit5 = (string)T_Num();
+
+//=============================
+//Digit 6-7 : Pair ID
+//=============================
+ 
 for(int i=0;i<ArrayRange(Core28Pairs,0);i++)
   {
    if(symbol == Core28Pairs[i])
      {
       if(i <= 9)
         {
-         tempString2 = StringConcatenate("0"+(string)i); //add zero in front of the number
+         digit6_7 = StringConcatenate("0"+(string)i); //add zero in front of the number
         } else
             {
-             tempString2 = (string)i;
+             digit6_7 = (string)i;
             }
            
       break;
      }
   }    
 
-//Comment(tempString2);
-result = StrToInteger(StringConcatenate(tempString1, tempString2));        //translate to integer
+
+//Final Result:
+result = StrToInteger(StringConcatenate(year, digit2, digit3_4,digit5,digit6_7));        //translate to integer
 return(result);
  
 } 

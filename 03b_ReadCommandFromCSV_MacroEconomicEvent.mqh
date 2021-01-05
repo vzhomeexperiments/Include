@@ -43,7 +43,14 @@ static int el1 = 0; // added ver.02
 static int el2 = 0; // added ver.02
 
 string str, word, trigger;
-
+/*
+handle=FileOpen("01_MacroeconomicEvent.csv",FILE_READ|FILE_SHARE_READ);
+if(handle==-1){Alert("Error - file does not exist"); TradePossible = TRUE; } 
+if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty");  }*/
+  
+            handle=0; 
+       while( handle==0 || handle==-1 ){handle = FileOpen("01_MacroeconomicEvent.csv",FILE_CSV|FILE_READ|FILE_SHARE_READ|FILE_WRITE|FILE_SHARE_WRITE);}
+   
 
    while(!FileIsEnding(handle) && TradePossible == FALSE)
    {
