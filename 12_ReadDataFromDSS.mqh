@@ -60,7 +60,7 @@ double ReadDataFromDSS(string symbol, int chart_period, string mode)
       f_name = "AI_M";
       
       
-         handle=FileOpen(f_name+IntegerToString(chart_period)+"_Change"+symbol+".csv",FILE_READ|FILE_CSV,"@");
+         handle=FileOpen(f_name+IntegerToString(chart_period)+"_Change"+symbol+".csv",FILE_SHARE_READ|FILE_CSV,"@");
       if(handle==-1){Comment("Error - file does not exist"); str = "-1"; } 
       if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty"); }
          
@@ -87,7 +87,7 @@ double ReadDataFromDSS(string symbol, int chart_period, string mode)
      {
       f_name = "StrTest-";
          
-      handle=FileOpen(f_name+symbol+"M"+IntegerToString(chart_period)+".csv",FILE_READ|FILE_CSV,"@");
+      handle=FileOpen(f_name+symbol+"M"+IntegerToString(chart_period)+".csv",FILE_SHARE_READ|FILE_CSV,"@");
       if(handle==-1){Comment("Error - file does not exist"); str = "-1"; } 
       if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty"); }
          
@@ -140,7 +140,7 @@ double ReadDataFromDSS(string symbol, int chart_period, string mode)
       f_name = "AI_MarketType_";
       
       
-         handle=FileOpen(f_name+symbol+IntegerToString(chart_period)+".csv",FILE_READ|FILE_CSV,"@");
+         handle=FileOpen(f_name+symbol+IntegerToString(chart_period)+".csv",FILE_SHARE_READ|FILE_CSV,"@");
       if(handle==-1){Comment("Error - file does not exist"); str = "-1"; } 
       if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty"); }
          

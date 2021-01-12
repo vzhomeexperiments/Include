@@ -40,7 +40,7 @@ int T_Num()
    int terminalNumber;
    string str;
    
-   handle=FileOpen("terminal.csv",FILE_SHARE_READ);
+   handle=FileOpen("terminal.csv",FILE_CSV|FILE_SHARE_READ);
       if(handle==-1)Print("Function Read terminal: Error - file does not exist, create file terminal.csv in the sandbox"); 
       if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty, add a number the file terminal.csv"); }
          
