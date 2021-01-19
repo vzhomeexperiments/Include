@@ -5,6 +5,7 @@
 #property copyright "Copyright 2020, Vladimir Zhbanko"
 #property link      "https://vladdsm.github.io/myblog_attempt/"
 #property strict
+#property version   "3.00"
 // function to write order profits to csv using EA
 // version 01
 // date 31.07.2016
@@ -21,6 +22,9 @@ User guide:
 2. Add function call inside start function to EA: e.g.: OrderProfitToCSV(TradeTermNumber);
 3. Add include call to this file  to EAe.g.:            #include <02_OrderProfitToCSV.mqh>
 */
+//+------------------------------------------------------------------+
+//| FUNCTION ORDER PROFIT TO CSV
+//+------------------------------------------------------------------+
 void OrderProfitToCSV(int terminalNumber)
 {
    //*3*_Logging closed orders to the file csv for further order management in R
@@ -42,7 +46,7 @@ void OrderProfitToCSV(int terminalNumber)
                  // record info to the file csv
                  string fileName = "OrdersResultsT"+string(terminalNumber)+".csv";//create the name of the file same for all symbols...
                  // open file handle
-                 int handle = FileOpen(fileName,FILE_CSV|FILE_SHARE_READ|FILE_SHARE_WRITE);
+                 int handle = FileOpen(fileName,FILE_CSV|FILE_READ|FILE_WRITE|FILE_SHARE_READ|FILE_SHARE_WRITE);
                               FileSeek(handle,0,SEEK_END);
                  string data = string(MagicNumber) + "," + string(ordTicket) + "," + string(ordOT) + "," + string(ordCT) + ","
                  + DoubleToStr(profit,2)+ ","+ordPair+","+string(ordTyp);
@@ -52,3 +56,4 @@ void OrderProfitToCSV(int terminalNumber)
       }
           prevAmountTickets = nTickets; //defining previous amount of tickets to avoid double entries!
 }
+
