@@ -21,6 +21,7 @@ Function is returning TRUE if it's a new bar start
 User guide:
 1. #include this file to the folder Include
 2. add code in the beginning of the Start function: if(!isNewBar())return(0);
+3. add code inside condition to run once at the beginning of the bar if(Option && isNewBar()){...}
 */
 
 //+------------------------------------------------------------------+
@@ -51,3 +52,14 @@ bool isNewBar()
 //+------------------------------------------------------------------+
 // End of FUNCTION is New Bar
 //+------------------------------------------------------------------+
+
+
+bool IsNewCandle()
+{
+   static datetime saved_candle_time;
+   if(Time[0] == saved_candle_time)
+   return false;
+   else
+   saved_candle_time = Time[0];
+   return true;
+}
