@@ -2,7 +2,7 @@
 //|                                         03_ReadCommandFromCSV.mqh |
 //|                                  Copyright 2018, Vladimir Zhbanko |
 //+-------------------------------------------------------------------+
-#property copyright "Copyright 2018, Vladimir Zhbanko"
+#property copyright "Copyright 2021, Vladimir Zhbanko"
 #property link      "https://vladdsm.github.io/myblog_attempt/"
 #property strict
 // function to recieve command to trade from csv
@@ -34,7 +34,7 @@ static int el2 = 0; // added ver.02
 
 string str, word;
 
-handle=FileOpen("SystemControl"+string(Magic)+".csv",FILE_SHARE_READ);
+handle=FileOpen("SystemControl"+string(Magic)+".csv",FILE_READ|FILE_SHARE_READ);
 if(handle==-1){Comment("Error - file does not exist"); TradePossible = TRUE; } 
 if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty");  }
    

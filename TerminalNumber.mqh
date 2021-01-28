@@ -3,7 +3,7 @@
 //|                                  Copyright 2021, Vladimir Zhbanko |
 //|                                  Contributor: Florian Assous      |
 //+-------------------------------------------------------------------+
-#property copyright "Copyright 2021 Vladimir Zhbanko"
+#property copyright "Copyright 2018,2021 Vladimir Zhbanko"
 #property link      "https://vladdsm.github.io/myblog_attempt/"
 #property strict
 // function returning an integer value with Termnal Number from Magic Number
@@ -12,9 +12,10 @@
 
 //+-------------------------------------------------------------+//
 // Aim of this function is to return information about the terminal number
+// to enable writing to file
 //+-------------------------------------------------------------+//
 /*
-@purpose 
+@purpose Function Functional Description:
 Function is using a flat file 'terminal.csv' to read and retrieve the terminal number
 @detail
 It is imperative to create file 'terminal.csv' and place there a number (1 or 2 or 3 or 4...)
@@ -39,19 +40,8 @@ int T_Num()
    int terminalNumber;
    string str;
    
-   handle=FileOpen("terminal.csv",FILE_CSV|FILE_SHARE_READ);
-      if(handle==-1){
-                     Print("Function Read terminal: Error - file does not exist, create file terminal.csv in the sandbox"); 
-                     Sleep(100);
-                     handle=FileOpen("terminal.csv",FILE_CSV|FILE_SHARE_READ);
-                     if(handle == -1)
-                       {
-                        Print("Still can't open file terminal.csv, showing error!");
-                        terminalNumber = -1;
-                        return(terminalNumber);
-                       }
-                    } 
-      
+   handle=FileOpen("terminal.csv",FILE_READ);
+      if(handle==-1)Print("Function Read terminal: Error - file does not exist, create file terminal.csv in the sandbox"); 
       if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty, add a number the file terminal.csv"); }
          
          while(!FileIsEnding(handle))

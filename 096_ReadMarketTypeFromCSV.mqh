@@ -2,13 +2,12 @@
 //|                                     096_ReadMarketTypeFromCSV.mqh |
 //|                                  Copyright 2018, Vladimir Zhbanko |
 //+-------------------------------------------------------------------+
-#property copyright "Copyright 2018, Vladimir Zhbanko"
+#property copyright "Copyright 2021, Vladimir Zhbanko"
 #property link      "https://vladdsm.github.io/myblog_attempt/"
 #property version   "1.002"  
 #property strict
 // function to recieve market type from csv
-// version 1.001 date 29.12.2017
-// version 1.002 date 15.04.2018 
+// deppricated - use 12_ReadDataFromDSS.mqh
 
 #define MARKET_NONE 0       //Market not siutable for trading e.g. macroeconomic event or not properly defined
 #define MARKET_BUN  1       //Market with bullish character
@@ -67,7 +66,7 @@ ushort u_sep;                // The code of the separator character
 string result[];             // An array to get string elements
 string full_line;            // String reserved for a file string
 
-handle=FileOpen("AI_MarketType_"+symbol+IntegerToString(chart_period)+".csv",FILE_SHARE_READ);
+handle=FileOpen("AI_MarketType_"+symbol+IntegerToString(chart_period)+".csv",FILE_READ|FILE_SHARE_READ);
 if(handle==-1){Comment("Error - file does not exist"); str = "-1"; } 
 if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty"); }
    
@@ -102,48 +101,4 @@ if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty"); }
    return(output);
 }
 
-//2021 01 12 Derive Market Type rule from indicators
-//+-------------------------------------------------------------+//
-//Function requires input of the symbol 
-//+-------------------------------------------------------------+//
-/*
-User guide:
-1. Add global bool variable to EA: e.g.:                     int     MyMarketType;
-2. Add function call inside start function to EA: e.g.: MyMarketType = ReadMarketFromCSV(Symbol());
-3. Adapt Trading Robot conditions to change trading strategy parameters eg.: see Falcon_C
-4. Add include call to this file  to EAe.g.:            #include <096_ReadMarketTypeFromCSV.mqh>
-*/
-int ReadMarketFromIND(string symbol)
-{
-/*
-- Function uses the manual rule
 
-Identify 3 Market Types: BUN, RAN, BEV
-  Use 2 indicators: MA and Bears as follows:
-  BUN: D1 MA950 < D1 MA10 && D1 Bears24 > 0 
-  BEV: D1 MA950 > D1 MA10 && D1 Bears24 < 0
-  RAN: D1 MA950 < D1 MA10 && D1 Bears24 > 0 || D1 MA950 > D1 MA10 && D1 Bears24 > 0
- 
-*/
-   //define internal variables needed
-   int marketType = -1;         //Variable to store and return the market type
-   string res = "0";            //Variable to return result of the function
-   
-
-   //define indicator values
-   double D1MA950 = iMA(symbol, PERIOD_D1, 950, 0, 0, 0, 1);
-   double  D1MA10 = iMA(symbol, PERIOD_D1, 10, 0, 0, 0, 1);
-   double D1BE24 = iBearsPower(symbol, PERIOD_D1, 24, 0, 1);
-   
-   //Assign market variable based on result
-   //if(res == "0" || res == "-1") {marketType = MARKET_NONE; return(marketType); }
-   if(((D1MA950 < D1MA10) && (D1BE24 > 0))){marketType = MARKET_BUN;  return(marketType); }
-   //if(res == "2" || res == "BUV"){marketType = MARKET_BUV;  return(marketType); }
-   if(((D1MA950 > D1MA10) && (D1BE24 < 0))){marketType = MARKET_BEN;  return(marketType); }
-   //if(res == "4" || res == "BEV"){marketType = MARKET_BEV;  return(marketType); }
-   if((((D1MA950 < D1MA10) && (D1BE24 < 0)) || ((D1MA950 > D1MA10) && (D1BE24 > 0)))){marketType = MARKET_RAN;  return(marketType); }
-   //if(res == "6" || res == "RAV"){marketType = MARKET_RAV;  return(marketType); }
-   
-   return(marketType); //in anomalous case function will return error '-1'
- 
-} 

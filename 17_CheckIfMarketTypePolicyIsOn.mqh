@@ -2,7 +2,7 @@
 //|                                17_CheckIfMarketTypePolicyIsOn.mqh |
 //|                                  Copyright 2018, Vladimir Zhbanko |
 //+-------------------------------------------------------------------+
-#property copyright "Copyright 2018, Vladimir Zhbanko"
+#property copyright "Copyright 2021, Vladimir Zhbanko"
 #property link      "https://vladdsm.github.io/myblog_attempt/"
 #property strict
 // function to recieve and analyse Reinforcement Learning Policy derived by Decision Support System
@@ -53,7 +53,7 @@ handle=FileOpen("SystemControlMT"+string(Magic)+".csv",FILE_READ|FILE_CSV,"@");
 
 // fail safe mechanism
 if(handle==-1){Comment("Error - file does not exist"); MTPolicyIsOn = false; } 
-if(FileSize(handle)==0){FileClose(handle); Comment("Error - File is empty");  }
+if(FileSize(handle)==0){FileClose(handle); Comment("Error - File SystemControlMT is empty");  }
    
    // analyse the content of each string line by line
    while(!FileIsEnding(handle))

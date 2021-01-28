@@ -2,7 +2,7 @@
 //|                                          19_AssignMagicNumber.mqh |
 //|                                  Copyright 2020, Vladimir Zhbanko |
 //+-------------------------------------------------------------------+
-#property copyright "Copyright 2020, Vladimir Zhbanko"
+#property copyright "Copyright 2021, Vladimir Zhbanko"
 #property link      "https://vladdsm.github.io/myblog_attempt/"
 #property version   "1.001"  
 #property strict
@@ -30,9 +30,7 @@ Digit 5 : Terminal number
 Digit 6-7 : Pair ID
 */
 
-#include <08_TerminalNumber.mqh>
-
-int AssignMagicNumber(string symbol, string strat)
+int AssignMagicNumber(string symbol, string strat, int termnum)
 {
 /*
 - 
@@ -77,7 +75,7 @@ string digit3_4 = strat;
 //=============================
 //Digit 5 : Terminal number
 //=============================
-string digit5 = (string)T_Num();
+string digit5 = (string)termnum;
 
 //=============================
 //Digit 6-7 : Pair ID

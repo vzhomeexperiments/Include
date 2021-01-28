@@ -15,3 +15,8 @@ StdLibErr.mqh
 WinUser32.mqh
 Clarissa_Functions.mqh
 OptimalLotSize.mqh
+GetError.mqh
+GetTradeFlagCondition.mqh
+MarketClose.mqh
+SL_HighestPoint.mqh
+TP_HighestPoint.mqh
