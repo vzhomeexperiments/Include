@@ -127,7 +127,7 @@ int ExitSignalOnTimerMagic(int CrossOccurred, int Magic, int MaxOrderCloseTimer)
    if(CrossOccurred==1)
      {
       //checking the orders time before closing them
-      for(int i=0; i<OrdersTotal(); i++)
+       for(int i=OrdersTotal()-1; i>=0; i--) 
         {
          CurrOrderHoldTime = 0;
          if(OrderSelect(i,SELECT_BY_POS,MODE_TRADES)==true &&
@@ -146,7 +146,7 @@ int ExitSignalOnTimerMagic(int CrossOccurred, int Magic, int MaxOrderCloseTimer)
    if(CrossOccurred==2)
      {
       //checking the orders time before closing them
-      for(int i=0; i<OrdersTotal(); i++)
+       for(int i=OrdersTotal()-1; i>=0; i--) 
         {
          CurrOrderHoldTime = 0;
          if(OrderSelect(i,SELECT_BY_POS,MODE_TRADES)==true &&
@@ -185,7 +185,7 @@ int ExitSignalOnAI(int CrossOccurred, int Magic, double CurrPrediction)
    if(CrossOccurred==1) //condition for sell orders
      {
       //checking the orders time before closing them
-      for(int i=0; i<OrdersTotal(); i++)
+       for(int i=OrdersTotal()-1; i>=0; i--) 
         {
          CurrOrderProfit = 0;
          if(OrderSelect(i,SELECT_BY_POS,MODE_TRADES)==true &&
@@ -202,7 +202,7 @@ int ExitSignalOnAI(int CrossOccurred, int Magic, double CurrPrediction)
    if(CrossOccurred==2) //condition for buy orders
      {
       //checking the orders time before closing them
-      for(int i=0; i<OrdersTotal(); i++)
+       for(int i=OrdersTotal()-1; i>=0; i--) 
         {
          CurrOrderProfit = 0;
          if(OrderSelect(i,SELECT_BY_POS,MODE_TRADES)==true &&
@@ -406,7 +406,7 @@ int CountPosOrders(int Magic,int TYPE)
 // This function counts number of positions/orders of OrderType TYPE
 
    int Orders=0;
-   for(int i=0; i<OrdersTotal(); i++)
+    for(int i=OrdersTotal()-1; i>=0; i--) 
      {
       if(OrderSelect(i,SELECT_BY_POS,MODE_TRADES)==true && OrderSymbol()==Symbol() && OrderMagicNumber()==Magic && OrderType()==TYPE)
          Orders++;
@@ -1850,7 +1850,7 @@ void SetDSSInfoList(bool Journaling, int MyTimeHold, int MyMT, int tkt, int Magi
 
    for(int x=0; x<ArraySize(infoArray); x++) // Loop through elements in DSSInfoList
      { 
-      if(infoArray[x,0]==0)  // Checks if the element is empty
+      if(infoArray[x,0]==0 && tkt > 0)  // Checks if the element is empty and the ticket is not -1
         { 
          infoArray[x,0] = tkt; // Add order number
          infoArray[x,1] = MyTimeHold; // Add Time to hold the order in Hours 
@@ -1911,7 +1911,7 @@ if(FileSize(handle)==0){FileClose(handle); Comment("Error - File MarketTypeLog i
             int k = StringSplit(str,u_sep,result); 
             // array result will contain only 1 line, we must perform data manipulation for each line and only then to close file
                //Go trough all open orders, filter and get the ticket number
-               for(int i=0;i<OrdersTotal();i++)
+                for(int i=OrdersTotal()-1; i>=0; i--) 
                  {
                   if(OrderSelect(i,SELECT_BY_POS, MODE_TRADES)==true && OrderSymbol() == symbol && OrderMagicNumber() == magic)
                     {

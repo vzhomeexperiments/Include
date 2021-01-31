@@ -20,3 +20,4 @@ GetTradeFlagCondition.mqh
 MarketClose.mqh
 SL_HighestPoint.mqh
 TP_HighestPoint.mqh
+NeuroNet.mqh
