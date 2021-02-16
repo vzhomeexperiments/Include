@@ -106,14 +106,15 @@ double ReadDataFromDSS(string symbol, int chart_period, string mode)
                //--- Split the string to substrings and store to the array result[] 
                int k = StringSplit(str,u_sep,result); 
                // extract content of the string array [for better clarify]
-      
+               
          }
       FileClose(handle);
       //Interpret the line content
-      if(mode == "read_trigger") {output = StringToDouble(result[0]); return(output);}// test passed?  
-      if(mode == "read_timehold") {output = StringToDouble(result[1]); return(output);}// test passed?  
-      if(mode == "read_maxperf") {output = StringToDouble(result[3]); return(output);}// test passed?
-      if(mode == "read_quantile") {output = StringToDouble(result[4]); return(output);}// test passed?
+      if(ArraySize(result) != 5) Print("Array size is "+(string)ArraySize(result)+ " but it must be 5!");
+      if(mode == "read_trigger" && ArraySize(result) >= 1) {output = StringToDouble(result[0]); return(output);}// test passed?  
+      if(mode == "read_timehold" && ArraySize(result) >= 2) {output = StringToDouble(result[1]); return(output);}// test passed?  
+      if(mode == "read_maxperf" && ArraySize(result) >= 4) {output = StringToDouble(result[3]); return(output);}// test passed?
+      if(mode == "read_quantile" && ArraySize(result) == 5) {output = StringToDouble(result[4]); return(output);}// test passed?
 
       /*tested pass: read_trigger
       Read value: ok
@@ -249,7 +250,7 @@ if(mode == "read_rlpolicy")
       handle=FileOpen(f_name+string(magic)+".csv",FILE_READ|FILE_CSV,"@");
 
       // fail safe mechanism
-      if(handle==-1){Comment("Error - file SystemControlMTxx does not exist"); MTPolicyIsOn = false; } 
+      if(handle==-1){Comment("Error - file SystemControlMTxx does not exist"); return(MTPolicyIsOn);} 
       if(FileSize(handle)==0){
          FileClose(handle); Comment("Error - File SystemControlMTxx is empty"); 
          Sleep(50);
@@ -258,7 +259,6 @@ if(mode == "read_rlpolicy")
            {
             FileClose(handle);
             Comment("Tried 2 times but File AI_MarketType_ xx is empty");
-            MTPolicyIsOn = false; 
             return(MTPolicyIsOn);
            }
          }
