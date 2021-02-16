@@ -2458,10 +2458,14 @@ bool GetTradeFlagConditionDSS_Bot(double ExpectedMoveLF, //predicted change from
       if(DirectionCheck == "buy" && 
       ExpectedMoveLF > EntryTradeTriggerLF && ExpectedMoveHF > EntryTradeTriggerHF &&
       ModelQualityHF > MinModQualityHF &&
+      MinModQualityHF > 0 &&
+      MinModQualityLF > 0 &&
       MTConfidence > 0.97) result = True; 
    else if(DirectionCheck == "sell" && 
       ExpectedMoveLF < (-1*EntryTradeTriggerLF) && ExpectedMoveHF < (-1*EntryTradeTriggerHF) && 
       ModelQualityHF > MinModQualityHF &&
+      MinModQualityHF > 0 &&
+      MinModQualityLF > 0 &&
       MTConfidence > 0.97) result = True;
      }
    if(!OptTwoModels)
