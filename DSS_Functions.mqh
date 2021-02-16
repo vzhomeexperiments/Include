@@ -53,7 +53,6 @@ Content:
 34) GetErrorDescription
 35) GetTradeFlagCondition
 36) GetTradePrediction
-
 */
 
 //+------------------------------------------------------------------+
