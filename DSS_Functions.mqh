@@ -293,8 +293,8 @@ int ExitSignalOnTimerTicketBars(int CrossOccurred, int Magic, int BarTimeframeMi
 // Type: Customisable 
 // Modify this function to suit your trading robot
 
-// This function checks for exit signals for each open order separately using the ticket
-// If this will output 2 then one or more BUY orders shall be closed
+// This function checks for exit signals for each open order separately using the information inside the array
+// If this will output
 //                     1 then one or more SELL orders shall be closed
 // This function will calculate order open time in BARS!
 
@@ -1790,47 +1790,45 @@ void UpdateVolTrailingList(bool Journaling,int Retry_Interval,int Magic, int & V
 
 void UpdateDSSInfoList(bool Journaling,int Retry_Interval,int Magic, int & infoArray [][]) 
   {
-// Type: Fixed Template 
-// Do not edit unless you know what you're doing
+// This function clears the elements of our DSSInfoList if the corresponding positions have been closed
 
-// This function clears the elements of your DSSInfoList if the corresponding positions has been closed
-
-   int ordersPos=OrdersTotal();
+   //int ordersPos=OrdersTotal();
    int orderTicketNumber;
-   bool doesPosExist;
 
-// Check the DSSInfoList, match with current list of positions. Make sure the all the positions exists. 
-// If it doesn't, it means there are positions that have been closed
+// Check the DSSInfoList, match with current list of closed positions.
+// If there is a match then array element is set to 0
 
    for(int x=0; x<ArrayRange(infoArray,0); x++)
      { // Looping through all order number in list
 
-      doesPosExist=False;
       orderTicketNumber=infoArray[x,0];
       
 
       if(orderTicketNumber!=0)
-        { // Order exists
-         for(int y=ordersPos-1; y>=0; y--)
-           { // Looping through all current open positions
-            if(OrderSelect(y,SELECT_BY_POS,MODE_TRADES)==true && OrderSymbol()==Symbol() && OrderMagicNumber()==Magic)
+        { // Ticket exists inside array
+         
+           if(OrderSelect(orderTicketNumber,SELECT_BY_TICKET,MODE_HISTORY)==true && OrderSymbol()==Symbol() && OrderMagicNumber()==Magic &&
+                                            OrderCloseTime() > 0)
               {
-               if(orderTicketNumber==OrderTicket())
-                 { // Checks order number in list against order number of current positions
-                  doesPosExist=True;
-                  break;
-                 }
+               if(Journaling)Print("EA Journaling: For Magic Number... " + (string)Magic + " and the Order "+(string)infoArray[x,0]+
+                             " corresponding order was closed. The element "+(string)x+" of array will be set to zero");
+               //clear up elements of that array
+               infoArray[x,0] = 0;
+               infoArray[x,1] = 0;
+               infoArray[x,2] = 0;
+               //show error if array was not cleared
+               if(infoArray[x,0] != 0)
+                {
+                 if(Journaling)Print("EA Journaling: Error, array element " + (string)x + " was not cleared!" + 
+                                     " the value is " + (string)infoArray[x,0]);
+                }   
               }
-           }
-
-         if(doesPosExist==False)
-           { // Deletes elements if the order number does not match any current positions
-            infoArray[x,0] = 0;
-            infoArray[x,1] = 0;
-            infoArray[x,2] = 0;
-           }
+           
+              
         }
+  
      }
+     
   }
 //+------------------------------------------------------------------+
 //| End of Update DSS Info List                                           
@@ -1842,15 +1840,17 @@ void UpdateDSSInfoList(bool Journaling,int Retry_Interval,int Magic, int & infoA
 void SetDSSInfoList(bool Journaling, int MyTimeHold, int MyMT, int tkt, int Magic, int & infoArray [][])
   {
 // Type: Fixed Template 
-// Do not edit unless you know what you're doing 
 
 //SetDSSInfoList(OnJournaling,AItimehold,MyMarketType, OrderNumber, MagicNumber);
-
-// This function adds new Time to hold order and market type records to array
+if(tkt > 0)
+  {
+   
+// This function adds new elements into array:
+// Ticket, Time to hold order, market type records
 
    for(int x=0; x<ArraySize(infoArray); x++) // Loop through elements in DSSInfoList
      { 
-      if(infoArray[x,0]==0 && tkt > 0)  // Checks if the element is empty and the ticket is not -1
+      if(infoArray[x,0]==0)  // Checks if the element is empty
         { 
          infoArray[x,0] = tkt; // Add order number
          infoArray[x,1] = MyTimeHold; // Add Time to hold the order in Hours 
@@ -1858,8 +1858,14 @@ void SetDSSInfoList(bool Journaling, int MyTimeHold, int MyMT, int tkt, int Magi
          if(Journaling)Print("EA Journaling: For Magic Number... " + (string)Magic + " and the Order "+(string)infoArray[x,0]+
                              " we assign a Time to hold the order in Minutes "+(string)infoArray[x,1]+";"+" predicted MarketType is: "+(string)infoArray[x,2]);
          break;
-        }
+        } else
+            {
+             if(Journaling)Print("EA Journaling: Array element: " + (string)x +" was not empty... " + 
+                                 " we will check another element... ");
+            }
      }
+    
+  } 
   }
 //+------------------------------------------------------------------+
 //| End of Set DSSInfoList
@@ -1868,7 +1874,7 @@ void SetDSSInfoList(bool Journaling, int MyTimeHold, int MyMT, int tkt, int Magi
 //| Restore DSSInfoList
 //+------------------------------------------------------------------+
 
-void RestoreDSSInfoList(string symbol, int magic, int & infoArray [][])
+void RestoreDSSInfoList(bool Journaling, string symbol, int magic, int & infoArray [][])
   {
 /* 
 @purpose: Function is needed to restore position of DSSInfoList Arrays in case of abrupt EA closure. In cases when there will be some open orders we will 
@@ -1921,9 +1927,9 @@ if(FileSize(handle)==0){FileClose(handle); Comment("Error - File MarketTypeLog i
                      for(int y=0;y<ArraySize(result);y++)
                        {
                         //check if array result contains tkt
-                        if(StringToInteger(result[y])== tkt)
+                        if(StringToInteger(result[y])== tkt) //this is a condition to restore the array! --> open position and log file...
                           {
-                           //find element of array equals to 0 (free to use)
+                           //find if element of array equals to 0 (free to use)
                            for(int j=0;j<ArrayRange(infoArray,0);j++)
                              {
                               if(infoArray[j,0] == 0 && infoArray[j,1] == 0 && infoArray[j,2] == 0)
@@ -1934,7 +1940,10 @@ if(FileSize(handle)==0){FileClose(handle); Comment("Error - File MarketTypeLog i
                                  infoArray[j,1] = (int)StringToInteger(result[y+2]);
                                  //store next element (market type) in the same array
                                  infoArray[j,2] = (int)StringToInteger(result[y+1]);
-                                 //debugging: write_debug_array()
+                                 if(Journaling)Print("EA Journaling: Restoring array DSS Info List. For Magic Number... " + 
+                                    (string)magic + " and the Order "+(string)tkt+
+                                    " we are updating those values into array! "+(string)j+
+                                    ";"+" The array ticket element now contains value: "+(string)infoArray[j,0]);
                                  break; //exit this for loop as we have already populated free element of array
                                 }
                              } //end of for loop to scroll through DSSListArray
