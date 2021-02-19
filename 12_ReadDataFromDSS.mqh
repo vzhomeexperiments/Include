@@ -218,6 +218,8 @@ Parameters:
 
 @options
 mode = "read_rlpolicy"    read Reinforcement Learning Policy
+mode = "read_command"    read system control command
+
 
 */
 bool BoolReadDataFromDSS(int magic, int MT, string mode)
@@ -225,7 +227,7 @@ bool BoolReadDataFromDSS(int magic, int MT, string mode)
 
 //Declaring variables
 int handle;      
-bool MTPolicyIsOn = False;
+bool output = False;
 string str, mt_val;
 string sep=",";                // A separator as a character 
 ushort u_sep;    // The code of the separator character 
@@ -250,7 +252,7 @@ if(mode == "read_rlpolicy")
       handle=FileOpen(f_name+string(magic)+".csv",FILE_READ|FILE_CSV,"@");
 
       // fail safe mechanism
-      if(handle==-1){Comment("Error - file SystemControlMTxx does not exist"); return(MTPolicyIsOn);} 
+      if(handle==-1){Comment("Error - file SystemControlMTxx does not exist"); return(output);} 
       if(FileSize(handle)==0){
          FileClose(handle); Comment("Error - File SystemControlMTxx is empty"); 
          Sleep(50);
@@ -259,7 +261,7 @@ if(mode == "read_rlpolicy")
            {
             FileClose(handle);
             Comment("Tried 2 times but File AI_MarketType_ xx is empty");
-            return(MTPolicyIsOn);
+            return(output);
            }
          }
 
@@ -286,11 +288,11 @@ if(mode == "read_rlpolicy")
       if(elem1 == mt_val)
         {
           // analyse the second element [policy], convert to boolean and return the result
-          if(elem2 == "ON")  MTPolicyIsOn = True;  
-          if(elem2 == "OFF") MTPolicyIsOn = False;
+          if(elem2 == "ON")  output = True;  
+          if(elem2 == "OFF") output = False;
           FileClose(handle);
           //in case file will not contain desired market type symbols function will still return false
-          return(MTPolicyIsOn); 
+          return(output); 
           
            
         }
@@ -307,8 +309,68 @@ if(mode == "read_rlpolicy")
 
 
      }
+   if(mode == "read_command")
+     {
+      f_name = "SystemControl";
+      
+      // open the file   
+      handle=FileOpen(f_name+string(magic)+".csv",FILE_READ|FILE_CSV,"@");
 
+      // fail safe mechanism
+      if(handle==-1){Comment("Error - file SystemControl xx does not exist"); return(output);} 
+      if(FileSize(handle)==0){
+         FileClose(handle); Comment("Error - File SystemControlxx is empty"); 
+         Sleep(50);
+          handle=FileOpen(f_name+string(magic)+".csv",FILE_READ|FILE_CSV,"@");
+         if(FileSize(handle)==0)
+           {
+            FileClose(handle);
+            Comment("Tried 2 times but File SystemControlxx_ xx is empty");
+            return(output);
+           }
+         }
+      
+         // analyse the content of each string line by line
+         while(!FileIsEnding(handle))
+         {
+         str=FileReadString(handle); //storing content of the current line
+         
+            //defines variables for this operation
+            
+            
+            //full current line
+            full_line = StringSubstr(str,0);
+            //--- Get the separator code 
+            u_sep=StringGetCharacter(sep,0); 
+            //--- Split the string to substrings and store to the array result[] 
+            int k = StringSplit(str,u_sep,result); 
+            // extract content of the string array [for better clarify]
+            elem1 = result[0];
+            elem2 = result[1];
+            // check if current element is corresponding to the market type we are checking
+            if(elem1 == (string)magic)
+              {
+                // analyse the second element [policy], convert to boolean and return the result
+                if(elem2 == "1")  output = True;  
+                if(elem2 == "0") output = False;
+                FileClose(handle);
+                //in case file will not contain desired market type symbols function will still return false
+                return(output); 
+                
+                 
+              }
+        
+         }
+         FileClose(handle);
+      
+      /*tested pass: 
+      Read value: ok
+      Missing File: ok 
+      Empty File: ok
+      */
+      
+     }
    //in case file will not contain desired market type symbols function will still return false
-   return(MTPolicyIsOn); 
+   return(output); 
 
 }
