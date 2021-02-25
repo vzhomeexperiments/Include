@@ -4,8 +4,8 @@ rem Use in case some content needs to be replaced (reverted from Version Control
 @echo off
 setlocal enabledelayedexpansion
 
-set SOURCE_DIR="C:\Users\fxtrams\Documents\000_TradingRepo\Include"
-set DEST_DIR="C:\Program Files (x86)\FxPro - Terminal2\MQL4\Include"
+set SOURCE_DIR="%PATH_DSS_Repo%\Include"
+set DEST_DIR=%PATH_T2_I%
 
 ROBOCOPY %SOURCE_DIR% %DEST_DIR% *.mqh
 
