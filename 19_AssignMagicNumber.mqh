@@ -44,11 +44,11 @@ string year, digit6_7;
 //=============================
 // Digit 1 : current year digit
 //=============================
-year = (string)Year();
+year = "2021";
 year = StringSubstr(year, 3, 1);
 
 //=============================
-// Digit 2 : type (1= live account ; 2 : demo account ; 3 : contest) 
+// Digit 2 : type (2= live account ; 2 : demo account ; 3 : contest) 
 //=============================
 ENUM_ACCOUNT_TRADE_MODE account_type=(ENUM_ACCOUNT_TRADE_MODE)AccountInfoInteger(ACCOUNT_TRADE_MODE); 
 
@@ -62,7 +62,7 @@ ENUM_ACCOUNT_TRADE_MODE account_type=(ENUM_ACCOUNT_TRADE_MODE)AccountInfoInteger
          digit2 ="3"; 
          break; 
       default: 
-         digit2 ="1"; 
+         digit2 ="2"; 
          break; 
      } 
 
