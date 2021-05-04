@@ -374,3 +374,73 @@ if(mode == "read_rlpolicy")
    return(output); 
 
 }
+
+
+/*Function to read files from DSS and create string output
+
+Parameters:
+@param mode string, specifying the file type that needs to be read
+
+@options
+mode = "read_dss_input"    read value of best input folder to use
+
+*/
+string StringReadDataFromDSS(string mode)
+{
+
+//Declaring variables
+int handle;      
+string output = "0_00";
+string str, mt_val;
+string sep=",";                // A separator as a character 
+string full_line, elem1, elem2;
+string f_name;               // File name prefix
+string result[]; // An array to get strings 
+
+if(mode == "read_dss_input")
+     {
+      
+      f_name = "AccountBestInput";
+      
+      // open the file   
+      handle=FileOpen(f_name+".csv",FILE_READ|FILE_CSV,"@");
+
+      // fail safe mechanism
+      if(handle==-1){Comment("Error - file AccountBestInput does not exist"); return(output);} 
+      if(FileSize(handle)==0){
+         FileClose(handle); Comment("Error - File AccountBestInput is empty"); 
+         Sleep(50);
+          handle=FileOpen(f_name+".csv",FILE_READ|FILE_CSV,"@");
+         if(FileSize(handle)==0)
+           {
+            FileClose(handle);
+            Comment("Tried 2 times but File AccountBestInput is empty");
+            return(output);
+           }
+         }
+
+      
+
+   // analyse the content of each string line by line
+   while(!FileIsEnding(handle))
+   {
+   output=FileReadString(handle); //storing content of the last line
+     
+   }
+   FileClose(handle);
+
+
+      /*tested pass: 
+      Read value: ok
+      Missing File: ok 
+      Empty File: ok
+      */
+
+
+     }
+      
+
+   //in case file will not contain desired market type symbols function will still return "0_00"
+   return(output); 
+
+}
