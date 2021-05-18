@@ -403,14 +403,14 @@ if(mode == "read_dss_input")
       f_name = "AccountBestInput";
       
       // open the file   
-      handle=FileOpen(f_name+".csv",FILE_READ|FILE_CSV,"@");
+      handle=FileOpen(f_name+".csv",FILE_READ|FILE_SHARE_READ|FILE_CSV,"@");
 
       // fail safe mechanism
       if(handle==-1){Comment("Error - file AccountBestInput does not exist"); return(output);} 
       if(FileSize(handle)==0){
          FileClose(handle); Comment("Error - File AccountBestInput is empty"); 
          Sleep(50);
-          handle=FileOpen(f_name+".csv",FILE_READ|FILE_CSV,"@");
+          handle=FileOpen(f_name+".csv",FILE_READ|FILE_SHARE_READ|FILE_CSV,"@");
          if(FileSize(handle)==0)
            {
             FileClose(handle);
