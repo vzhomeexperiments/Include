@@ -354,6 +354,7 @@ if(mode == "read_rlpolicy")
                 if(elem2 == "1")  output = True;  
                 if(elem2 == "0") output = False;
                 FileClose(handle);
+                Sleep(50);
                 //in case file will not contain desired market type symbols function will still return false
                 return(output); 
                 
