@@ -2909,8 +2909,106 @@ bool GetTradeFlagConditionDSS_Hybrid(double ExpectedMoveLF, //predicted change f
 //+------------------------------------------------------------------+
 //| End of GetTradeFlagCondition                                                
 //+------------------------------------------------------------------+    
+//+------------------------------------------------------------------+
+//| GetTradeFlagConditionDSS_DRL_Bot                                              
+//+------------------------------------------------------------------+
+/*
+New condition 2021-01-18
+*/
+bool GetTradeFlagConditionDSS_DRL_Bot(int ExpectedMove, //predicted direction from DSS
+                           double MTConfidence,  // Achieved prediction confidence for Market Type
+                           string DirectionCheck,  //which direction to check "buy" "sell"
+                           bool   OptDRLModel)    //option to use two models for trading decision
+  {
+// This function checks trade flag based on hard coded logic and return either false or true
 
+   bool result=False;
+   
+   if(OptDRLModel)
+     {
+      if(DirectionCheck == "buy" && 
+      ExpectedMove == 777 &&
+      MTConfidence > 0.97) result = True; 
+   else if(DirectionCheck == "sell" && 
+      ExpectedMove == 333 && 
+      MTConfidence > 0.97) result = True;
+     }
+      
+   return(result);
 
+/* description: 
+   Function will use provided information to decide whether to flag buy or sell condition as true or false
+   DSS will also provide an output to the strategy test, this value is used as a filter to use this pair for trading
+ 
+*/
+  }
+//+------------------------------------------------------------------+
+//| End of GetTradeFlagConditionDSS_DRL_Bot                                                
+//+------------------------------------------------------------------+    
+//+------------------------------------------------------------------+
+//| Dashboard - ShowDashboardDSS_DRL_Bot                                   
+//+------------------------------------------------------------------+
+/*
+ShowDashboard("Magic Number ", MagicNumber,
+              "Market Type ", MyMarketType,
+              "MyMarketTypeConf ", MyMarketTypeConf,
+              
+              "AI PriceChange Lower Period", int(AIChangeLP),
+              "AI PriceChange Higher Period", int(AIChangeHP),
+              "AItrigger L Period", AItriggerLP,
+              "AItimehold L Period M15 Bars", int(AItimeholdLP),
+              
+              "AImaxperf LP", AImaxperfLP,
+              "AIminperf LP", int(AIminperfLP),
+              "AImaxperf HP", AImaxperfHP,
+              "AIminperf HP", int(AIminperfHP)); 
+*/
+
+void ShowDashboardDSS_DRL_Bot(string Descr0, int Int1,
+                   string Descr1, int my_market_type,
+                   string Descr2, double Doubl1) 
+  {
+// Purpose: This function creates a dashboard showing information on your EA using comments function
+// Type: Customisable 
+// Modify this function to suit your trading robot
+//----
+/*
+Conversion of Market Types
+if(res == "0" || res == "-1") {marketType = MARKET_NONE; return(marketType); }
+   if(res == "1" || res == "BUN"){marketType = MARKET_BUN;  return(marketType); }
+   if(res == "2" || res == "BUV"){marketType = MARKET_BUV;  return(marketType); }
+   if(res == "3" || res == "BEN"){marketType = MARKET_BEN;  return(marketType); }
+   if(res == "4" || res == "BEV"){marketType = MARKET_BEV;  return(marketType); }
+   if(res == "5" || res == "RAN"){marketType = MARKET_RAN;  return(marketType); }
+   if(res == "6" || res == "RAV"){marketType = MARKET_RAV;  return(marketType); }
+*/
+
+string new_line = "\n"; // "\n" or "\n\n" will move the comment to new line
+string space = ": ";    // generate space
+string underscore = "________________________________";
+string market_type;
+
+//Convert Integer value of Market Type to String value
+if(my_market_type == 0) market_type = "ERR";
+if(my_market_type == 777) market_type = "BUY";
+if(my_market_type == 333) market_type = "SELL";
+
+Comment(
+        new_line 
+      + Descr0 + space + IntegerToString(Int1)
+      + new_line      
+      + Descr1 + space + market_type
+      + new_line 
+      + Descr2 + space + DoubleToString(Doubl1, 2)
+      + new_line 
+      + "");
+      
+      
+  }
+
+//+------------------------------------------------------------------+
+//| End of Dashboard - ShowDashboardDSS_DRL_Bot                                     
+//+------------------------------------------------------------------+   
 
 //+------------------------------------------------------------------+
 //| ReadMarketFromIND                                              
@@ -2964,4 +3062,182 @@ Identify 3 Market Types: BUN, RAN, BEV
 } 
 //+------------------------------------------------------------------+
 //| End of ReadMarketFromIND                                                
+//+------------------------------------------------------------------+ 
+//+------------------------------------------------------------------+
+//| Start of WriteDataSetRLUnit
+//+------------------------------------------------------------------+ 
+double bar_type(string sym, int peri, int shiftbar)
+{
+                     //bars characterization
+                     double iHg = iHigh(sym, peri,shiftbar);
+                     double iLw = iLow(sym, peri,shiftbar);
+                     double iOp = iOpen(sym, peri,shiftbar);
+                     double iCs = iClose(sym, peri,shiftbar);
+                     //bar type +10 bull; -10 bear
+                     double bartype = 0;
+                     if(iOp < iCs) bartype = 100;
+                     if(iOp > iCs) bartype = 0;
+                     if(iOp == iCs)bartype = 50;
+                       
+                     return(bartype);
+}
+
+double high_whisk(string sym, int peri, int shiftbar)
+{
+                     //bars characterization
+                     double iHg = iHigh(sym, peri,shiftbar);
+                     double iLw = iLow(sym, peri,shiftbar);
+                     double iOp = iOpen(sym, peri,shiftbar);
+                     double iCs = iClose(sym, peri,shiftbar);
+                     //% of the higher whisker
+                     double hWisk = 0;
+                     // bullish
+                     if(iOp < iCs) hWisk = 100*((iHg-iCs)/(iHg-iLw));
+                     // bearish
+                     if(iOp > iCs) hWisk = 100*((iHg-iOp)/(iHg-iLw));;
+                     return(hWisk);
+}
+
+double low_whisk(string sym, int peri, int shiftbar)
+{
+                     //bars characterization
+                     double iHg = iHigh(sym, peri,shiftbar);
+                     double iLw = iLow(sym, peri,shiftbar);
+                     double iOp = iOpen(sym, peri,shiftbar);
+                     double iCs = iClose(sym, peri,shiftbar);
+                     //% of the lower whisker
+                     double lWisk = 0;
+                     // bullish
+                     if(iOp < iCs) lWisk = 100*((iOp-iLw)/(iHg-iLw));
+                     // bearish
+                     if(iOp > iCs) lWisk = 100*((iCs-iLw)/(iHg-iLw));;
+                     return(lWisk);
+}
+
+
+double bar_body(string sym, int peri, int shiftbar)
+{
+                     //bars characterization
+                     double iHg = iHigh(sym, peri,shiftbar);
+                     double iLw = iLow(sym, peri,shiftbar);
+                     double iOp = iOpen(sym, peri,shiftbar);
+                     double iCs = iClose(sym, peri,shiftbar);
+                     //% of the lower whisker
+                     double bBody = 0;
+                     // bullish
+                     if(iOp < iCs) bBody = 100*((iCs-iOp)/(iHg-iLw));
+                     // bearish
+                     if(iOp > iCs) bBody = 100*((iOp-iCs)/(iHg-iLw));
+                     if(iOp == iCs) bBody = 0;
+                     return(bBody);
+}
+
+void WriteDataSetRLUnit(string symboll, string foldname, string filename, int charPer1, int barsCollect, bool dssInput)
+// function to record 28 currencies pairs close price to the file (file to be used by all R scripts)
+ {
+ 
+
+ int digits = (int)MarketInfo(symboll, MODE_DIGITS);
+   
+string data;    //identifier that will be used to collect data string
+string filepath;
+datetime TIME;  //Time index
+               if(!dssInput)filepath = foldname+"\\"+filename; //dss_input == False creates sub folders with simulation data
+               if(dssInput)filepath = filename; //dss_input == True creates files in the sandbox
+                 
+               // delete file if it's exist
+               FileDelete(filepath);
+               // open file handle
+               int handle = FileOpen(filepath,FILE_CSV|FILE_READ|FILE_WRITE);
+                FileSeek(handle,0,SEEK_SET);
+               // generate data now using for loop
+
+  
+               // ===================================================================================================
+               // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+               // ===================================================================================================
+
+               if(StringCompare(foldname, "6_06")== 0)
+                 {
+                        //loop j calculates surfaces and angles from beginning of the day
+                     for(int j = 1; j < barsCollect; j++)    //j scrolls through bars of the day
+                       {
+                         TIME = iTime(symboll, charPer1, j);  //Time of the bar of the applied chart symbol
+                         data = string(TIME); 
+                          
+                           string ind[40];
+                           
+                           //ind[0] acts as a label
+                           if((iClose(symboll,charPer1,j+34)-iClose(symboll,charPer1,j)) < 0){ind[0] = "BUY";}else{ind[0] = "SELL";}
+                           
+                           //ind[1-3] will act like a reward results
+                           ind[1]  = DoubleToStr((iClose(symboll,charPer1,j)-iClose(symboll,charPer1,j+10)),digits);
+                           ind[2]  = DoubleToStr((iClose(symboll,charPer1,j)-iClose(symboll,charPer1,j+20)),digits);
+                           ind[3]  = DoubleToStr((iClose(symboll,charPer1,j)-iClose(symboll,charPer1,j+30)),digits);
+                           
+                           //ind[4-39] act like an indicator pattern
+                           ind[4] = DoubleToStr(bar_type(symboll, charPer1, j));
+                           ind[5] = DoubleToStr(high_whisk(symboll, charPer1, j));
+                           ind[6] = DoubleToStr(low_whisk(symboll, charPer1, j));
+                           ind[7] = DoubleToStr(bar_body(symboll, charPer1, j));
+                           
+                           ind[8] = DoubleToStr(bar_type(symboll, charPer1, j+1));
+                           ind[9] = DoubleToStr(high_whisk(symboll, charPer1, j+1));
+                           ind[10] = DoubleToStr(low_whisk(symboll, charPer1, j+1));
+                           ind[11] = DoubleToStr(bar_body(symboll, charPer1, j+1));
+                           
+                           ind[12] = DoubleToStr(bar_type(symboll, charPer1, j+2));
+                           ind[13] = DoubleToStr(high_whisk(symboll, charPer1, j+2));
+                           ind[14] = DoubleToStr(low_whisk(symboll, charPer1, j+2));
+                           ind[15] = DoubleToStr(bar_body(symboll, charPer1, j+2));
+                           
+                           ind[16] = DoubleToStr(bar_type(symboll, charPer1, j+3));
+                           ind[17] = DoubleToStr(high_whisk(symboll, charPer1, j+3));
+                           ind[18] = DoubleToStr(low_whisk(symboll, charPer1, j+3));
+                           ind[19] = DoubleToStr(bar_body(symboll, charPer1, j+3));
+                           
+                           ind[20] = DoubleToStr(bar_type(symboll, charPer1, j+5));
+                           ind[21] = DoubleToStr(high_whisk(symboll, charPer1, j+5));
+                           ind[22] = DoubleToStr(low_whisk(symboll, charPer1, j+5));
+                           ind[23] = DoubleToStr(bar_body(symboll, charPer1, j+5));
+                           
+                           ind[24] = DoubleToStr(bar_type(symboll, charPer1, j+8));
+                           ind[25] = DoubleToStr(high_whisk(symboll, charPer1, j+8));
+                           ind[26] = DoubleToStr(low_whisk(symboll, charPer1, j+8));
+                           ind[27] = DoubleToStr(bar_body(symboll, charPer1, j+8));
+                           
+                           ind[28] = DoubleToStr(bar_type(symboll, charPer1, j+13));
+                           ind[29] = DoubleToStr(high_whisk(symboll, charPer1, j+13));
+                           ind[30] = DoubleToStr(low_whisk(symboll, charPer1, j+13));
+                           ind[31] = DoubleToStr(bar_body(symboll, charPer1, j+13));
+                           
+                           ind[32] = DoubleToStr(bar_type(symboll, charPer1, j+21));
+                           ind[33] = DoubleToStr(high_whisk(symboll, charPer1, j+21));
+                           ind[34] = DoubleToStr(low_whisk(symboll, charPer1, j+21));
+                           ind[35] = DoubleToStr(bar_body(symboll, charPer1, j+21));
+                           
+                           ind[36] = DoubleToStr(bar_type(symboll, charPer1, j+34));
+                           ind[37] = DoubleToStr(high_whisk(symboll, charPer1, j+34));
+                           ind[38] = DoubleToStr(low_whisk(symboll, charPer1, j+34));
+                           ind[39] = DoubleToStr(bar_body(symboll, charPer1, j+34));
+                           
+                           
+                           for(int i=0;i<ArraySize(ind);i++) data = data + ","+ind[i];   
+                           
+                           FileWrite(handle,data);   //write data to the file during each for loop iteration
+                       }
+                     
+                     //             
+                      FileClose(handle);        //close file when data write is over
+                     //---------------------------------------------------------------------------------------------
+                 }           
+               // ===================================================================================================
+               // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+               // ===================================================================================================
+      
+  }
+
+
+//+------------------------------------------------------------------+
+//| End of WriteDataSetRLUnit                                                
 //+------------------------------------------------------------------+ 

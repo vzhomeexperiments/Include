@@ -39,6 +39,9 @@ mode = "read_quantile"  read first quantile from all model performances
 #define MARKET_BEV  4       //Market with volatile bearish character
 #define MARKET_RAN  5       //Market with Ranging character
 #define MARKET_RAV  6       //Market with volatile Ranging character
+#define MARKET_BUY  777
+#define MARKET_SELL 333
+
 
 double ReadDataFromDSS(string symbol, int chart_period, string mode)
 {
@@ -202,7 +205,65 @@ double ReadDataFromDSS(string symbol, int chart_period, string mode)
       
      }  
    
+   if(mode == "read_drl_conf" || mode == "read_drl")
+     {
+      
+      f_name = "RLUnitOut";
+      
+      handle=FileOpen(f_name+symbol+".csv",FILE_READ|FILE_SHARE_READ|FILE_CSV,"@");
+      if(handle==-1){Comment("Error - file RLUnitOut[Symbol] does not exist"); return(output); } 
+      if(FileSize(handle)==0){
+               FileClose(handle); Comment("Error - File RLUnitOut xx is empty"); 
+               Sleep(50);
+               handle=FileOpen(f_name+symbol+".csv",FILE_READ|FILE_SHARE_READ|FILE_CSV,"@");
+               if(FileSize(handle)==0)
+                 {
+                  FileClose(handle);
+                  Comment("Tried 2 times but File RLUnitOut xx is empty");
+                  return(output);
+                 }
+               }
+         
+       // analyse the content of each string line by line
+      while(!FileIsEnding(handle))
+      {
+            str=FileReadString(handle); //storing content of the current line
+         
+            //full current line
+            full_line = StringSubstr(str,0);
+            //--- Get the separator code 
+            u_sep=StringGetCharacter(sep,0); 
+            //--- Split the string to substrings and store to the array result[] 
+            int k = StringSplit(str,u_sep,result); 
+            // extract content of the string array [for better clarify]
+            
+              
    
+      }
+      FileClose(handle);
+      
+         if(mode == "read_drl_conf") {output = StringToDouble(result[1]); return(output);}
+         if(mode == "read_drl") 
+                 { 
+                  //Assign market variable based on result
+                  if(result[0] == "BUY"){output = MARKET_BUY; return(output); }
+                  else if(result[0] == "SELL"){output = MARKET_SELL; return(output); }
+                  else {output = MARKET_NONE; return(output);}
+                 }
+      
+      /*tested pass:  read_drl_conf
+      Read value: ok
+      Missing File:  
+      Empty File: 
+      */
+      /*tested pass: read_drl
+      Read value: ok
+      Missing File:  
+      Empty File:
+      */
+      
+      
+     }     
       
  return(output);
  
