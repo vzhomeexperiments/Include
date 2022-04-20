@@ -3138,6 +3138,7 @@ void WriteDataSetRLUnit(string symboll, string foldname, string filename, int ch
  
 
  int digits = (int)MarketInfo(symboll, MODE_DIGITS);
+ int shift = 30;
    
 string data;    //identifier that will be used to collect data string
 string filepath;
@@ -3176,50 +3177,50 @@ datetime TIME;  //Time index
                            ind[3]  = DoubleToStr((iClose(symboll,charPer1,j)-iClose(symboll,charPer1,j+30)),digits);
                            
                            //ind[4-39] act like an indicator pattern
-                           ind[4] = DoubleToStr(bar_type(symboll, charPer1, j));
-                           ind[5] = DoubleToStr(high_whisk(symboll, charPer1, j));
-                           ind[6] = DoubleToStr(low_whisk(symboll, charPer1, j));
-                           ind[7] = DoubleToStr(bar_body(symboll, charPer1, j));
+                           ind[4] = DoubleToStr(bar_type(symboll, charPer1, j+shift));
+                           ind[5] = DoubleToStr(high_whisk(symboll, charPer1, j+shift));
+                           ind[6] = DoubleToStr(low_whisk(symboll, charPer1, j+shift));
+                           ind[7] = DoubleToStr(bar_body(symboll, charPer1, j+shift));
                            
-                           ind[8] = DoubleToStr(bar_type(symboll, charPer1, j+1));
-                           ind[9] = DoubleToStr(high_whisk(symboll, charPer1, j+1));
-                           ind[10] = DoubleToStr(low_whisk(symboll, charPer1, j+1));
-                           ind[11] = DoubleToStr(bar_body(symboll, charPer1, j+1));
+                           ind[8] = DoubleToStr(bar_type(symboll, charPer1, j+1+shift));
+                           ind[9] = DoubleToStr(high_whisk(symboll, charPer1, j+1+shift));
+                           ind[10] = DoubleToStr(low_whisk(symboll, charPer1, j+1+shift));
+                           ind[11] = DoubleToStr(bar_body(symboll, charPer1, j+1+shift));
                            
-                           ind[12] = DoubleToStr(bar_type(symboll, charPer1, j+2));
-                           ind[13] = DoubleToStr(high_whisk(symboll, charPer1, j+2));
-                           ind[14] = DoubleToStr(low_whisk(symboll, charPer1, j+2));
-                           ind[15] = DoubleToStr(bar_body(symboll, charPer1, j+2));
+                           ind[12] = DoubleToStr(bar_type(symboll, charPer1, j+2+shift));
+                           ind[13] = DoubleToStr(high_whisk(symboll, charPer1, j+2+shift));
+                           ind[14] = DoubleToStr(low_whisk(symboll, charPer1, j+2+shift));
+                           ind[15] = DoubleToStr(bar_body(symboll, charPer1, j+2+shift));
                            
-                           ind[16] = DoubleToStr(bar_type(symboll, charPer1, j+3));
-                           ind[17] = DoubleToStr(high_whisk(symboll, charPer1, j+3));
-                           ind[18] = DoubleToStr(low_whisk(symboll, charPer1, j+3));
-                           ind[19] = DoubleToStr(bar_body(symboll, charPer1, j+3));
+                           ind[16] = DoubleToStr(bar_type(symboll, charPer1, j+3+shift));
+                           ind[17] = DoubleToStr(high_whisk(symboll, charPer1, j+3+shift));
+                           ind[18] = DoubleToStr(low_whisk(symboll, charPer1, j+3+shift));
+                           ind[19] = DoubleToStr(bar_body(symboll, charPer1, j+3+shift));
                            
-                           ind[20] = DoubleToStr(bar_type(symboll, charPer1, j+5));
-                           ind[21] = DoubleToStr(high_whisk(symboll, charPer1, j+5));
-                           ind[22] = DoubleToStr(low_whisk(symboll, charPer1, j+5));
-                           ind[23] = DoubleToStr(bar_body(symboll, charPer1, j+5));
+                           ind[20] = DoubleToStr(bar_type(symboll, charPer1, j+5+shift));
+                           ind[21] = DoubleToStr(high_whisk(symboll, charPer1, j+5+shift));
+                           ind[22] = DoubleToStr(low_whisk(symboll, charPer1, j+5+shift));
+                           ind[23] = DoubleToStr(bar_body(symboll, charPer1, j+5+shift));
                            
-                           ind[24] = DoubleToStr(bar_type(symboll, charPer1, j+8));
-                           ind[25] = DoubleToStr(high_whisk(symboll, charPer1, j+8));
-                           ind[26] = DoubleToStr(low_whisk(symboll, charPer1, j+8));
-                           ind[27] = DoubleToStr(bar_body(symboll, charPer1, j+8));
+                           ind[24] = DoubleToStr(bar_type(symboll, charPer1, j+8+shift));
+                           ind[25] = DoubleToStr(high_whisk(symboll, charPer1, j+8+shift));
+                           ind[26] = DoubleToStr(low_whisk(symboll, charPer1, j+8+shift));
+                           ind[27] = DoubleToStr(bar_body(symboll, charPer1, j+8+shift));
                            
-                           ind[28] = DoubleToStr(bar_type(symboll, charPer1, j+13));
-                           ind[29] = DoubleToStr(high_whisk(symboll, charPer1, j+13));
-                           ind[30] = DoubleToStr(low_whisk(symboll, charPer1, j+13));
-                           ind[31] = DoubleToStr(bar_body(symboll, charPer1, j+13));
+                           ind[28] = DoubleToStr(bar_type(symboll, charPer1, j+13+shift));
+                           ind[29] = DoubleToStr(high_whisk(symboll, charPer1, j+13+shift));
+                           ind[30] = DoubleToStr(low_whisk(symboll, charPer1, j+13+shift));
+                           ind[31] = DoubleToStr(bar_body(symboll, charPer1, j+13+shift));
                            
-                           ind[32] = DoubleToStr(bar_type(symboll, charPer1, j+21));
-                           ind[33] = DoubleToStr(high_whisk(symboll, charPer1, j+21));
-                           ind[34] = DoubleToStr(low_whisk(symboll, charPer1, j+21));
-                           ind[35] = DoubleToStr(bar_body(symboll, charPer1, j+21));
+                           ind[32] = DoubleToStr(bar_type(symboll, charPer1, j+21+shift));
+                           ind[33] = DoubleToStr(high_whisk(symboll, charPer1, j+21+shift));
+                           ind[34] = DoubleToStr(low_whisk(symboll, charPer1, j+21+shift));
+                           ind[35] = DoubleToStr(bar_body(symboll, charPer1, j+21+shift));
                            
-                           ind[36] = DoubleToStr(bar_type(symboll, charPer1, j+34));
-                           ind[37] = DoubleToStr(high_whisk(symboll, charPer1, j+34));
-                           ind[38] = DoubleToStr(low_whisk(symboll, charPer1, j+34));
-                           ind[39] = DoubleToStr(bar_body(symboll, charPer1, j+34));
+                           ind[36] = DoubleToStr(bar_type(symboll, charPer1, j+34+shift));
+                           ind[37] = DoubleToStr(high_whisk(symboll, charPer1, j+34+shift));
+                           ind[38] = DoubleToStr(low_whisk(symboll, charPer1, j+34+shift));
+                           ind[39] = DoubleToStr(bar_body(symboll, charPer1, j+34+shift));
                            
                            
                            for(int i=0;i<ArraySize(ind);i++) data = data + ","+ind[i];   
@@ -3240,4 +3241,120 @@ datetime TIME;  //Time index
 
 //+------------------------------------------------------------------+
 //| End of WriteDataSetRLUnit                                                
+//+------------------------------------------------------------------+ 
+
+//+------------------------------------------------------------------+
+//| Start of WriteDataSetRLUnitExit
+//+------------------------------------------------------------------+ 
+void WriteDataSetRLUnitExit(int magic, string foldname, string filename, bool dssInput)
+// function to record information about the current open positions and indicators to the file (file to be used by R scripts)
+/*
+ purpose: build the DRL model in R that will dynamically decide whether to close or keep working trade
+ function will write information about the open order since it's opening to it's closure
+ this information will be updated at every bar and appended
+ such information will be joined with the order result
+ final result will be converted to eithe 'keep' or 'close' class and mapped to the previous rows that were generated
+ input will also be reinforced by actual profit loss of the system
+ information will be used to train the model that will be able to decide whether to keep trades or close them
+ 
+ function will also be handling the real-time data input provided to the model
+ r script will run in between of every bar
+
+          parameters to be used [brainstorming]:
+- current profit/loss
+- distance to TP in pips
+- distance to SL in pips
+- number of positions opened by this symbol
+- time of this order since opening
+- some indicators
+
+NOTE: Function will only be activated if there are opened positions for this magic number
+
+*/
+ {
+ 
+ double ticks = MarketInfo(Symbol(), MODE_TICKSIZE);
+ int nposSELL = CountPosOrders(magic, OP_SELL);
+ int nposBUY = CountPosOrders(magic, OP_BUY);
+ double rsi32, rsi14, rsi8, profit;  
+ int distTP, distSL, ordTicket, CurrOrderHoldTime,ordTyp;
+string data;    //identifier that will be used to collect data string
+string filepath;
+
+               if(!dssInput)filepath = foldname+"\\"+filename; //dss_input == False creates sub folders with simulation data
+               if(dssInput)filepath = filename; //dss_input == True creates files in the sandbox
+                 
+               // delete file if it's exist
+               FileDelete(filepath);
+               // open file handle
+               int handle = FileOpen(filepath,FILE_CSV|FILE_READ|FILE_WRITE);
+                FileSeek(handle,0,SEEK_SET);
+               // generate data now using for loop
+
+  
+               // ===================================================================================================
+               // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+               // ===================================================================================================
+
+               if(StringCompare(foldname, "6_06")== 0)
+                 {
+                    
+                    
+                    
+                    
+                    //going through the orders that are opened
+                      for(int i=OrdersTotal()-1; i>=0; i--) 
+                       {
+                        //select opened SELL order and write to the file
+                        if(OrderSelect(i,SELECT_BY_POS,MODE_TRADES)==true &&
+                                        OrderSymbol()==Symbol() &&
+                                        OrderMagicNumber()==magic && 
+                                        OrderType()==OP_SELL) 
+                           {//writing info about such opened order into the file
+                             profit  = NormalizeDouble(OrderProfit() + OrderSwap() + OrderCommission(),2);  
+                                ordTyp  = OrderType();
+                                 distTP = (iOpen(Symbol(), 0, 0)-OrderTakeProfit())/ticks;  //in pips
+                                 distSL = (OrderStopLoss()-iOpen(Symbol(), 0, 0))/ticks;    //in pips
+                               ordTicket  = OrderTicket();
+                             CurrOrderHoldTime = int((TimeCurrent() - OrderOpenTime())/60);
+                             rsi32 = iRSI(Symbol(), 0, 32, PRICE_CLOSE, 1);
+                             rsi14 = iRSI(Symbol(), 0, 14, PRICE_CLOSE, 1);
+                             rsi8 = iRSI(Symbol(), 0, 8, PRICE_CLOSE, 1);
+                            }
+                        //select opened BUY order and write to the file
+                        if(OrderSelect(i,SELECT_BY_POS,MODE_TRADES)==true &&
+                                        OrderSymbol()==Symbol() &&
+                                        OrderMagicNumber()==magic && 
+                                        OrderType()==OP_BUY) 
+                           {//writing info about such opened order into the file
+                             profit  = NormalizeDouble(OrderProfit() + OrderSwap() + OrderCommission(),2);  
+                                ordTyp  = OrderType();
+                                 distTP = (OrderTakeProfit()-iOpen(Symbol(), 0, 0))/ticks;  //in pips
+                                 distSL = (iOpen(Symbol(), 0, 0)-OrderStopLoss())/ticks;    //in pips
+                               ordTicket  = OrderTicket();
+                             CurrOrderHoldTime = int((TimeCurrent() - OrderOpenTime())/60);
+                             rsi32 = iRSI(Symbol(), 0, 32, PRICE_CLOSE, 1);
+                             rsi14 = iRSI(Symbol(), 0, 14, PRICE_CLOSE, 1);
+                             rsi8 = iRSI(Symbol(), 0, 8, PRICE_CLOSE, 1);
+                            }
+                               data = profit + "," + ordTyp + "," + nposSELL + "," + nposBUY + "," +
+                                      distTP +"," +distSL +"," +ordTicket +","+CurrOrderHoldTime +"," +
+                                      rsi32 + "," + rsi14 +","+rsi8;
+                        FileWrite(handle,data);   //write data to the file during each for loop iteration
+                       }
+                                
+                     
+                     //             
+                      FileClose(handle);        //close file when data write is over
+                     //---------------------------------------------------------------------------------------------
+                 }           
+               // ===================================================================================================
+               // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+               // ===================================================================================================
+      
+  }
+
+
+//+------------------------------------------------------------------+
+//| End of WriteDataSetRLUnitExit                                                
 //+------------------------------------------------------------------+ 
