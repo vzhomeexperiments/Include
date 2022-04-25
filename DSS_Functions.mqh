@@ -1,6 +1,6 @@
 //+-------------------------------------------------------------------+
 //|                                                 DSS_Functions.mqh |
-//|                                  Copyright 2021, Vladimir Zhbanko |
+//|                              Copyright 2021,2022 Vladimir Zhbanko |
 //+-------------------------------------------------------------------+
 #property copyright "Copyright 2021, Vladimir Zhbanko"
 #property link      "https://vladdsm.github.io/myblog_attempt/"
@@ -820,6 +820,74 @@ void CloseOrderPositionTimerBars(int TYPE,bool Journaling,int Magic, int BarTime
   }
 //+------------------------------------------------------------------+
 //| End of CLOSE/DELETE ORDERS AND POSITIONS 
+//+------------------------------------------------------------------+
+//+------------------------------------------------------------------+
+//| CLOSE/DELETE ORDERS AND POSITIONS CloseOrderPositionDRL
+//+------------------------------------------------------------------+
+void CloseOrderPositionDRL(int TYPE,bool Journaling,int Magic, int Slip,int K,int Retry_Interval)
+  {
+// Type: Fixed Template 
+// Do not edit unless you know what you're doing
+
+// This function closes all positions of type TYPE which ticket numbers are listed in the file
+/*
+Approx Algorithm
+
+- read file for the symbol
+- while loop for each line read
+- try to select order mentioned in each line
+- compare value of the ticket with value in the file
+- implement decision - close position if value predict is CLOSE
+- close file once everything was read
+*/
+
+//begin of fun Restore DSSInfoList
+int handle;
+int tikt; //reserved for the ticket value in the file
+string str;
+
+//Read content of the file, store content into the array 'result[]'
+handle=FileOpen("RLUnitOut"+Symbol()+"Exit.csv",FILE_READ|FILE_SHARE_READ);
+if(handle==-1){
+   Comment("Error - file - File RLUnitOutxxxxxxExit does not exist");
+   Sleep(200); //attempt to read again
+   handle=FileOpen("RLUnitOut"+Symbol()+"Exit.csv",FILE_READ|FILE_SHARE_READ);
+   if(handle == -1){Comment("Tried 2 times, file with log does not exists!"); str = "-1"; }
+   } 
+if(FileSize(handle)==0){FileClose(handle); Comment("Error - File RLUnitOutxxxxxxExit is empty"); }
+
+       // analyse the content of each string line by line
+      while(!FileIsEnding(handle))
+      {
+            str=FileReadString(handle); //storing content of the current line
+            tikt = (int)StringToInteger(str); //convert content of the string to the integer containing ticket number to be closed
+            
+            // We check only tickets that have a ticket!
+         if((TYPE==OP_BUY || TYPE==OP_SELL) && tikt != 0)
+           {
+            if(OrderSelect(tikt,SELECT_BY_TICKET,MODE_TRADES)==true && OrderSymbol()==Symbol() && OrderMagicNumber()==Magic && OrderType()==TYPE)
+              {
+               //closing this order
+                        bool Closing=false;
+                        double Price=0;
+                        color arrow_color=0;if(TYPE==OP_BUY)arrow_color=Blue;if(TYPE==OP_SELL)arrow_color=Green;
+                        if(Journaling)Print("EA Journaling: Trying to close position "+(string)OrderTicket()+" ...");
+                        HandleTradingEnvironment(Journaling,Retry_Interval);
+                        if(TYPE==OP_BUY)Price=Bid; if(TYPE==OP_SELL)Price=Ask;
+                        Closing=OrderClose(OrderTicket(),OrderLots(),Price,Slip*K,arrow_color);
+                        if(Journaling && !Closing)Print("EA Journaling: Unexpected Error has happened. Error Description: "+GetErrorDescription(GetLastError()));
+                        if(Journaling && Closing)Print("EA Journaling: Position successfully closed.");
+              }
+           }
+            
+            
+      }
+      FileClose(handle);
+
+
+  }
+//+------------------------------------------------------------------+
+//| End of CLOSE/DELETE ORDERS AND POSITIONS CloseOrderPositionDRL
 //+------------------------------------------------------------------+
 //+------------------------------------------------------------------+
 //| Check for 4/5 Digits Broker              
@@ -1897,10 +1965,10 @@ string full_line;            // String reserved for a file string
 //Read content of the file, store content into the array 'result[]'
 handle=FileOpen("MarketTypeLog"+IntegerToString(magic)+".csv",FILE_READ|FILE_SHARE_READ);
 if(handle==-1){
-   Comment("Error - file does not exist");
+   Comment("Error - file MarketTypeLog does not exist");
    Sleep(200); //attempt to read again
    handle=FileOpen("MarketTypeLog"+IntegerToString(magic)+".csv",FILE_READ|FILE_SHARE_READ);
-   if(handle == -1){Comment("Tried 2 times, file with log does not exists!"); str = "-1"; }
+   if(handle == -1){Comment("Tried 2 times, file MarketTypeLog with log does not exists!"); str = "-1"; }
    } 
 if(FileSize(handle)==0){FileClose(handle); Comment("Error - File MarketTypeLog is empty"); }
 
@@ -3272,12 +3340,16 @@ NOTE: Function will only be activated if there are opened positions for this mag
 
 */
  {
- 
+  int digits = (int)MarketInfo(Symbol(), MODE_DIGITS);
  double ticks = MarketInfo(Symbol(), MODE_TICKSIZE);
  int nposSELL = CountPosOrders(magic, OP_SELL);
  int nposBUY = CountPosOrders(magic, OP_BUY);
- double rsi32, rsi14, rsi8, profit;  
- int distTP, distSL, ordTicket, CurrOrderHoldTime,ordTyp;
+ string rsi32, rsi14, rsi8, profit;  
+ int ordTicket, CurrOrderHoldTime,ordTyp;
+ string distTP, distSL;
+ rsi32 = DoubleToStr(iRSI(Symbol(), 0, 32, PRICE_CLOSE, 1),digits);
+ rsi14 = DoubleToStr(iRSI(Symbol(), 0, 14, PRICE_CLOSE, 1),digits);
+ rsi8 = DoubleToStr(iRSI(Symbol(), 0, 8, PRICE_CLOSE, 1),digits);
 string data;    //identifier that will be used to collect data string
 string filepath;
 
@@ -3311,15 +3383,19 @@ string filepath;
                                         OrderMagicNumber()==magic && 
                                         OrderType()==OP_SELL) 
                            {//writing info about such opened order into the file
-                             profit  = NormalizeDouble(OrderProfit() + OrderSwap() + OrderCommission(),2);  
+                             profit  = DoubleToStr(OrderProfit() + OrderSwap() + OrderCommission(),2);  
                                 ordTyp  = OrderType();
-                                 distTP = (iOpen(Symbol(), 0, 0)-OrderTakeProfit())/ticks;  //in pips
-                                 distSL = (OrderStopLoss()-iOpen(Symbol(), 0, 0))/ticks;    //in pips
+                                 distTP = DoubleToStr((iOpen(Symbol(), 0, 0)-OrderTakeProfit())/ticks,2);  //in pips
+                                 distSL = DoubleToStr((OrderStopLoss()-iOpen(Symbol(), 0, 0))/ticks,2);    //in pips
                                ordTicket  = OrderTicket();
                              CurrOrderHoldTime = int((TimeCurrent() - OrderOpenTime())/60);
-                             rsi32 = iRSI(Symbol(), 0, 32, PRICE_CLOSE, 1);
-                             rsi14 = iRSI(Symbol(), 0, 14, PRICE_CLOSE, 1);
-                             rsi8 = iRSI(Symbol(), 0, 8, PRICE_CLOSE, 1);
+                             data = string(profit) + "," + string(ordTyp) + "," + string(nposSELL) + "," + string(nposBUY) + "," +
+                                      string(distTP) +"," +string(distSL) +"," +string(ordTicket) +","+string(CurrOrderHoldTime) +"," +
+                                      string(rsi32) + "," + string(rsi14) +","+string(rsi8);
+                        FileWrite(handle,data);   //write data to the file during each for loop iteration
+                             
+                             
+                             
                             }
                         //select opened BUY order and write to the file
                         if(OrderSelect(i,SELECT_BY_POS,MODE_TRADES)==true &&
@@ -3327,23 +3403,19 @@ string filepath;
                                         OrderMagicNumber()==magic && 
                                         OrderType()==OP_BUY) 
                            {//writing info about such opened order into the file
-                             profit  = NormalizeDouble(OrderProfit() + OrderSwap() + OrderCommission(),2);  
+                             profit  = DoubleToStr(OrderProfit() + OrderSwap() + OrderCommission(),2);  
                                 ordTyp  = OrderType();
-                                 distTP = (OrderTakeProfit()-iOpen(Symbol(), 0, 0))/ticks;  //in pips
-                                 distSL = (iOpen(Symbol(), 0, 0)-OrderStopLoss())/ticks;    //in pips
+                                 distTP = DoubleToStr((OrderTakeProfit()-iOpen(Symbol(), 0, 0))/ticks,2);  //in pips
+                                 distSL = DoubleToStr((iOpen(Symbol(), 0, 0)-OrderStopLoss())/ticks,2);    //in pips
                                ordTicket  = OrderTicket();
                              CurrOrderHoldTime = int((TimeCurrent() - OrderOpenTime())/60);
-                             rsi32 = iRSI(Symbol(), 0, 32, PRICE_CLOSE, 1);
-                             rsi14 = iRSI(Symbol(), 0, 14, PRICE_CLOSE, 1);
-                             rsi8 = iRSI(Symbol(), 0, 8, PRICE_CLOSE, 1);
-                            }
-                               data = profit + "," + ordTyp + "," + nposSELL + "," + nposBUY + "," +
-                                      distTP +"," +distSL +"," +ordTicket +","+CurrOrderHoldTime +"," +
-                                      rsi32 + "," + rsi14 +","+rsi8;
+                             data = string(profit) + "," + string(ordTyp) + "," + string(nposSELL) + "," + string(nposBUY) + "," +
+                                      string(distTP) +"," +string(distSL) +"," +string(ordTicket) +","+string(CurrOrderHoldTime) +"," +
+                                      string(rsi32) + "," + string(rsi14) +","+string(rsi8);
                         FileWrite(handle,data);   //write data to the file during each for loop iteration
+                            }
+                               
                        }
-                                
-                     
                      //             
                       FileClose(handle);        //close file when data write is over
                      //---------------------------------------------------------------------------------------------

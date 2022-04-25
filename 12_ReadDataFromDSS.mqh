@@ -4,11 +4,12 @@
 //+-------------------------------------------------------------------+
 #property copyright "Copyright 2021, Vladimir Zhbanko"
 #property link      "https://vladdsm.github.io/myblog_attempt/"
-#property version   "1.002"  
+#property version   "1.003"  
 #property strict
 // function to recieve information from csv files
 // version 1.001 initial version
 // version 1.002 add fail safe for file reading
+// version 1.003 add file id
 //+---------------------------------------------------------------------------------+//
 //Universal function to read different numeric files from the Decision Support System//
 //+---------------------------------------------------------------------------------+//
@@ -67,7 +68,7 @@ double ReadDataFromDSS(string symbol, int chart_period, string mode)
       f_name = "AI_M";
       
       handle=FileOpen(f_name+IntegerToString(chart_period)+"_Change"+symbol+".csv",FILE_READ|FILE_SHARE_READ|FILE_CSV,"@");
-      if(handle==-1){Comment("Error - file does not exist"); return(output); } 
+      if(handle==-1){Comment("Error - file AI_M does not exist"); return(output); } 
       if(FileSize(handle)==0){FileClose(handle); Comment("Error - File AI_M xx is empty"); return(output);}
          
       //this will bring the last element
@@ -94,7 +95,7 @@ double ReadDataFromDSS(string symbol, int chart_period, string mode)
       f_name = "StrTest-";
          
       handle=FileOpen(f_name+symbol+"M"+IntegerToString(chart_period)+".csv",FILE_READ|FILE_SHARE_READ|FILE_CSV,"@");
-      if(handle==-1){Comment("Error - file does not exist"); return(output); } 
+      if(handle==-1){Comment("Error - file StrTest does not exist"); return(output); } 
       if(FileSize(handle)==0){FileClose(handle); Comment("Error - File StrTest xx is empty"); return(output); }
          
          // analyse the content of each string line by line
