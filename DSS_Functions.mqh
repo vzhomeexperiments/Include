@@ -1,6 +1,6 @@
 //+-------------------------------------------------------------------+
 //|                                                 DSS_Functions.mqh |
-//|                              Copyright 2021,2022 Vladimir Zhbanko |
+//|                                  Copyright 2021, Vladimir Zhbanko |
 //+-------------------------------------------------------------------+
 #property copyright "Copyright 2021, Vladimir Zhbanko"
 #property link      "https://vladdsm.github.io/myblog_attempt/"
@@ -844,6 +844,7 @@ Approx Algorithm
 //begin of fun Restore DSSInfoList
 int handle;
 int tikt; //reserved for the ticket value in the file
+int CurrOrderHoldTime; //order time in minutes
 string str;
 
 //Read content of the file, store content into the array 'result[]'
@@ -867,8 +868,11 @@ if(FileSize(handle)==0){FileClose(handle); Comment("Error - File RLUnitOutxxxxxx
            {
             if(OrderSelect(tikt,SELECT_BY_TICKET,MODE_TRADES)==true && OrderSymbol()==Symbol() && OrderMagicNumber()==Magic && OrderType()==TYPE)
               {
-               //closing this order
-                        bool Closing=false;
+               //closing this order (however don't close if the time is too short
+               CurrOrderHoldTime = int((TimeCurrent() - OrderOpenTime())/60);
+               if(CurrOrderHoldTime > 480)
+                 {
+                  bool Closing=false;
                         double Price=0;
                         color arrow_color=0;if(TYPE==OP_BUY)arrow_color=Blue;if(TYPE==OP_SELL)arrow_color=Green;
                         if(Journaling)Print("EA Journaling: Trying to close position "+(string)OrderTicket()+" ...");
@@ -877,6 +881,8 @@ if(FileSize(handle)==0){FileClose(handle); Comment("Error - File RLUnitOutxxxxxx
                         Closing=OrderClose(OrderTicket(),OrderLots(),Price,Slip*K,arrow_color);
                         if(Journaling && !Closing)Print("EA Journaling: Unexpected Error has happened. Error Description: "+GetErrorDescription(GetLastError()));
                         if(Journaling && Closing)Print("EA Journaling: Position successfully closed.");
+                 }
+                        
               }
            }
             
