@@ -3020,6 +3020,71 @@ bool GetTradeFlagConditionDSS_DRL_Bot(int ExpectedMove, //predicted direction fr
 //| End of GetTradeFlagConditionDSS_DRL_Bot                                                
 //+------------------------------------------------------------------+    
 //+------------------------------------------------------------------+
+//| CheckActiveHours                                              
+//+------------------------------------------------------------------+
+/*
+Function to check server time is in one or more trading sessions
+Tested 2023-01-15
+Tokyo T London F NewYork F - ok
+Tokyo F London T NewYork F - ok
+Tokyo F London F NewYork T - ok
+Tokyo F London F NewYork F - ok
+Tokyo T London T NewYork T - ok
+Tokyo T London F NewYork T - ok
+Tokyo F London T NewYork T - ok
+Tokyo F London F NewYork T - ok
+*/
+bool CheckActiveHours(bool InTokyo, //should system be active in Tokyo Session?
+                      bool InLondon, //should system be active in London Session?
+                      bool InNewYork) //should system be active in NewYork Session?
+                      
+  {
+// This function checks for a condition based on hard coded logic and return either false or true
+
+   // Set operations disabled by default.
+   bool result = false;
+   bool resT = false; 
+   bool resL = false;
+   bool resN = false;
+   int TokSt = 22; int TokEnd = 8;
+   int LondSt = 8; int LondEnd = 16;
+   int NYSt = 13; int NYEnd = 22;
+   
+   // Check if the current hour is between the allowed hours of operations. If so, return true.
+   if(InTokyo)
+     {
+      if (((Hour() >= TokSt) && (Hour() <= 23)) || ((Hour() <= TokEnd) && (Hour() >= 0)))
+      resT = true;
+     }
+    if(InLondon)
+      {
+      if ((Hour() >= LondSt) && (Hour() <= LondEnd))
+         resL = true;
+     }
+    if(InNewYork)
+      {
+      if ((Hour() >= NYSt) && (Hour() <= NYEnd))
+         resN = true;
+     } 
+     
+   if(resT || resL || resN)
+     {
+      result = true;
+     }
+        
+   return result;
+
+/* description: 
+   Function will check if trading should be active at any given time by checking if the system
+   is in specific trading sessions (Tokyo, London, New York)
+   Note: Assumed trading server is in UTC + 2
+    
+*/
+  }
+//+------------------------------------------------------------------+
+//| End of CheckActiveHours                                                
+//+------------------------------------------------------------------+    
+//+------------------------------------------------------------------+
 //| Dashboard - ShowDashboardDSS_DRL_Bot                                   
 //+------------------------------------------------------------------+
 /*
