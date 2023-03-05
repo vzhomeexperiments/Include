@@ -2742,7 +2742,70 @@ Exit Sell:  CrossBelow0MacdLine(MDMainSh1 > MDSnglSh1 && MDMainSh2 < MDSnglSh2 &
 //| End of GetTradeFlagCondition                                                
 //+------------------------------------------------------------------+    
 
+//+------------------------------------------------------------------+
+//| Dashboard - Comment Version                                    
+//+------------------------------------------------------------------+
+void ShowDashboardDSS_Rule_Trend(string Descr0, int magic,
+                   string Descr2, bool Param1,
+                   string Descr3, double Param2,
+                   string Descr4, bool Param3,
+                   string Descr5, double Param4,
+                   string Descr6, bool Param5,
+                   string Descr7, double Param6
+                     ) 
+  {
+// Purpose: This function creates a dashboard showing information on your EA using comments function
+// Type: Customisable 
+// Modify this function to suit your trading robot
+//----
+/*
+Paremeters we show:
+   Trade in Tokyo?
+   Trade in London?
+   Trade in NY?
+   
+*/
 
+string new_line = "\n"; // "\n" or "\n\n" will move the comment to new line
+string space = ": ";    // generate space
+string underscore = "________________________________";
+
+
+Comment(
+        new_line 
+      + Descr0 + space + IntegerToString(magic)
+      + new_line      
+      + new_line 
+      + underscore  
+      + new_line
+      + new_line
+      + Descr2 + space + IntegerToString(Param1)
+      + new_line
+      + Descr3 + space + DoubleToString(Param2, 1)
+      + new_line        
+      + underscore  
+      + new_line 
+      + new_line
+      + Descr4 + space + IntegerToString(Param3)
+      + new_line
+      + Descr5 + space + DoubleToString(Param4, 1)
+      + new_line        
+      + underscore  
+      + new_line 
+      + new_line
+      + Descr6 + space + IntegerToString(Param5)
+      + new_line
+      + Descr7 + space + DoubleToString(Param6, 1)
+      + new_line        
+      + underscore  
+      + "");
+      
+      
+  }
+
+//+------------------------------------------------------------------+
+//| End of Dashboard - Comment Version                                     
+//+------------------------------------------------------------------+   
 
 //+------------------------------------------------------------------+
 //| GetTradeFlagCondition                                              
