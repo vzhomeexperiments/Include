@@ -2942,6 +2942,196 @@ Comment(
 //+------------------------------------------------------------------+   
 
 //+------------------------------------------------------------------+
+//| GetTradeFlagCondition                                              
+//+------------------------------------------------------------------+
+
+bool GetTradeFlagConditionDSS_Scalp(string DirectionCheck) //which direction to check "buy" "sell" "exitbuy" "exitsell"
+  {
+// This function checks trade flag based on hard coded logic and return either false or true
+/*
+Arbitrary Rules with default parameters:
+Entry Buy: buy trend, pull back + stoch.cross < 20%
+Entry Sell: sell trend, pull back + stoch.cross > 80%
+
+Enter Buy:  MACD 34, 144 is Positive, Pull Back: MACD 13, 21
+&& CrossStoch[StMainSh1 > StSnglSh1 & StMainSh2 < StSnglSh2] && StMainSh1 < 20
+Exit Buy:   AO shows 3 red bars 
+
+Enter Sell:  MACD 34, 144 is Negative, Pull Back: MACD 13, 21
+&& CrossStoch[StMainSh1 < StSnglSh1 & StMainSh2 > StSnglSh2] && StMainSh1 > 80
+Exit Sell:   AO shows 3 green bars
+
+*/
+   bool result=False;
+   bool Bull = False;
+   bool Bear = False;
+   
+   //get status of MACD 144 over last bars
+   double iMacd1 = iMACD(Symbol(),Period(),34,144,9, PRICE_CLOSE, MODE_MAIN, 1); // Shift 1
+   double iMacd6 = iMACD(Symbol(),Period(),34,144,9, PRICE_CLOSE, MODE_MAIN, 6); // Shift 6
+   double iMacd15 = iMACD(Symbol(),Period(),34,144,9, PRICE_CLOSE, MODE_MAIN, 15); // Shift 15
+   double iMacd20 = iMACD(Symbol(),Period(),34,144,9, PRICE_CLOSE, MODE_MAIN, 20); // Shift 20
+
+   //check MACD 144 indicator if it's in trend
+   if((iMacd1 > 0) && (iMacd6 > 0) && (iMacd15 > 0) && (iMacd20 > 0))
+     {
+      Bull = True;
+     } else if((iMacd1 < 0) && (iMacd6 < 0) && (iMacd15 < 0) && (iMacd20 < 0)){
+      Bear = True;
+     }
+
+   //use AO to detect pull back and change of direction
+   double iAO1 = iAO(Symbol(), Period(), 1);
+   double iAO2 = iAO(Symbol(), Period(), 2);
+   double iAO3 = iAO(Symbol(), Period(), 3);
+   double iAO4 = iAO(Symbol(), Period(), 4);
+   double iAO5 = iAO(Symbol(), Period(), 5);
+   
+   // There might be more scenarios, we identify only some states
+   bool st1 = false; bool st2 = false; bool st3 = false; bool st4 = false; bool st5 = false;
+   bool st6 = false; bool st7 = false; bool st8 = false; bool st9 = false; bool st10 = false;
+   // st1-st4 -> use to seek stoch cross to SELL
+   // st6-st9 -> use to seek stoch cross to BUY
+   // st4 -> stop BUY
+   // st9 -> stop SELL
+   //st1
+   if((iAO1 > 0) && (iAO2 > 0) && (iAO3 > 0) && (iAO4 > 0) && (iAO5 > 0) &&
+      (iAO1 > iAO2) && (iAO2 > iAO3) && (iAO3 > iAO4) && (iAO4 > iAO5)) {st1 = true;}
+   //st2   
+   else if((iAO1 > 0) && (iAO2 > 0) && (iAO3 > 0) && (iAO4 > 0) && (iAO5 > 0) &&
+      (iAO1 < iAO2) && (iAO2 > iAO3) && (iAO3 > iAO4) && (iAO4 > iAO5)) {st2 = true;}   
+   //st3   
+   else if((iAO1 > 0) && (iAO2 > 0) && (iAO3 > 0) && (iAO4 > 0) && (iAO5 > 0) &&
+      (iAO1 < iAO2) && (iAO2 < iAO3) && (iAO3 > iAO4) && (iAO4 > iAO5)) {st3 = true;}      
+   //st4   
+   else if((iAO1 > 0) && (iAO2 > 0) && (iAO3 > 0) && (iAO4 > 0) && (iAO5 > 0) &&
+      (iAO1 < iAO2) && (iAO2 < iAO3) && (iAO3 < iAO4) && (iAO4 > iAO5)) {st4 = true;}         
+   //st5   
+   else if((iAO1 > 0) && (iAO2 > 0) && (iAO3 > 0) && (iAO4 > 0) && (iAO5 > 0) &&
+      (iAO1 < iAO2) && (iAO2 < iAO3) && (iAO3 < iAO4) && (iAO4 < iAO5)) {st5 = true;}            
+   //st6
+   else if((iAO1 < 0) && (iAO2 < 0) && (iAO3 < 0) && (iAO4 < 0) && (iAO5 < 0) &&
+      (iAO1 < iAO2) && (iAO2 < iAO3) && (iAO3 < iAO4) && (iAO4 < iAO5)) {st6 = true;}
+   //st7   
+   else if((iAO1 < 0) && (iAO2 < 0) && (iAO3 < 0) && (iAO4 < 0) && (iAO5 < 0) &&
+      (iAO1 > iAO2) && (iAO2 < iAO3) && (iAO3 < iAO4) && (iAO4 < iAO5)) {st7 = true;}   
+   //st8   
+   else if((iAO1 < 0) && (iAO2 < 0) && (iAO3 < 0) && (iAO4 < 0) && (iAO5 < 0) &&
+      (iAO1 > iAO2) && (iAO2 > iAO3) && (iAO3 < iAO4) && (iAO4 < iAO5)) {st8 = true;}      
+   //st9   
+   else if((iAO1 < 0) && (iAO2 < 0) && (iAO3 < 0) && (iAO4 < 0) && (iAO5 < 0) &&
+      (iAO1 > iAO2) && (iAO2 > iAO3) && (iAO3 > iAO4) && (iAO4 < iAO5)) {st9 = true;}         
+   //st10   
+   else if((iAO1 < 0) && (iAO2 < 0) && (iAO3 < 0) && (iAO4 < 0) && (iAO5 < 0) &&
+      (iAO1 > iAO2) && (iAO2 > iAO3) && (iAO3 > iAO4) && (iAO4 > iAO5)) {st10 = true;}               
+
+   //Precise entry using Stoch indicator   
+
+   double StMainSh1 = iStochastic(Symbol(), Period(), 7, 3, 3, MODE_SMA, 0, MODE_MAIN, 1);
+   double StSnglSh1 = iStochastic(Symbol(), Period(), 7, 3, 3, MODE_SMA, 0, MODE_SIGNAL, 1);
+   double StMainSh2 = iStochastic(Symbol(), Period(), 7, 3, 3, MODE_SMA, 0, MODE_MAIN, 2);
+   double StSnglSh2 = iStochastic(Symbol(), Period(), 7, 3, 3, MODE_SMA, 0, MODE_SIGNAL, 2);
+   
+   //Use 'states' to decide entries/close of trades
+   if((DirectionCheck == "buy") && (st6 || st7 || st8 || st9) && (StMainSh1 > StSnglSh1) && (StMainSh2 < StSnglSh2) && (StMainSh1 < 20) && (Bull)) result = True; 
+   else if((DirectionCheck == "sell") && (st1 || st2 || st3 || st4) && (StMainSh1 < StSnglSh1) && (StMainSh2 > StSnglSh2) && (StMainSh1 > 80) && (Bear)) result = True;
+   else if((DirectionCheck == "exitbuy") && (st4 || st5)) result = True;  //(st4 || st5)) result = True;
+   else if((DirectionCheck == "exitsell") && (st9 || st10)) result = True; //(st9 || st10)) result = True;
+      
+   return(result);
+
+/* description: 
+   Function will use provided information to decide whether to flag buy or sell condition as true or false
+    
+*/
+  }
+ 
+//+------------------------------------------------------------------+
+//| End of GetTradeFlagCondition                                                
+//+------------------------------------------------------------------+    
+
+   
+//+------------------------------------------------------------------+
+//| Dashboard - Comment Version                                    
+//+------------------------------------------------------------------+
+void ShowDashboardDSS_Scalp(string Descr0, int magic,
+                   string Descr1, int my_market_type,
+                   string Descr2, int Param1,
+                   string Descr3, double Param2,
+                   string Descr4, int Param3,
+                   string Descr5, double Param4,
+                   string Descr6, int Param5,
+                   string Descr7, double Param6
+                     ) 
+  {
+// Purpose: This function creates a dashboard showing information on your EA using comments function
+// Type: Customisable 
+// Modify this function to suit your trading robot
+//----
+/*
+Conversion of Market Types
+if(res == "0" || res == "-1") {marketType = MARKET_NONE; return(marketType); }
+   if(res == "1" || res == "BUN"){marketType = MARKET_BUN;  return(marketType); }
+   if(res == "2" || res == "BUV"){marketType = MARKET_BUV;  return(marketType); }
+   if(res == "3" || res == "BEN"){marketType = MARKET_BEN;  return(marketType); }
+   if(res == "4" || res == "BEV"){marketType = MARKET_BEV;  return(marketType); }
+   if(res == "5" || res == "RAN"){marketType = MARKET_RAN;  return(marketType); }
+   if(res == "6" || res == "RAV"){marketType = MARKET_RAV;  return(marketType); }
+*/
+
+string new_line = "\n"; // "\n" or "\n\n" will move the comment to new line
+string space = ": ";    // generate space
+string underscore = "________________________________";
+string market_type;
+
+//Convert Integer value of Market Type to String value
+if(my_market_type == 0) market_type = "ERR";
+if(my_market_type == 1) market_type = "BUN";
+if(my_market_type == 2) market_type = "BUV";
+if(my_market_type == 3) market_type = "BEN";
+if(my_market_type == 4) market_type = "BEV";
+if(my_market_type == 5) market_type = "RAN";
+if(my_market_type == 6) market_type = "RAV";
+
+
+Comment(
+        new_line 
+      + Descr0 + space + IntegerToString(magic)
+      + new_line      
+      + Descr1 + space + market_type
+      + new_line 
+      + underscore  
+      + new_line
+      + new_line
+      + Descr2 + space + IntegerToString(Param1)
+      + new_line
+      + Descr3 + space + DoubleToString(Param2, 1)
+      + new_line        
+      + underscore  
+      + new_line 
+      + new_line
+      + Descr4 + space + IntegerToString(Param3)
+      + new_line
+      + Descr5 + space + DoubleToString(Param4, 1)
+      + new_line        
+      + underscore  
+      + new_line 
+      + new_line
+      + Descr6 + space + IntegerToString(Param5)
+      + new_line
+      + Descr7 + space + DoubleToString(Param6, 1)
+      + new_line        
+      + underscore  
+      + "");
+      
+      
+  }
+
+//+------------------------------------------------------------------+
+//| End of Dashboard - Comment Version                                     
+//+------------------------------------------------------------------+   
+
+//+------------------------------------------------------------------+
 //| Dashboard - Comment Version                                    
 //+------------------------------------------------------------------+
 /*
