@@ -5,7 +5,7 @@ rem Use in case some content needs to be replaced (reverted from Version Control
 setlocal enabledelayedexpansion
 
 set SOURCE_DIR="%PATH_DSS_Repo%\Include"
-set DEST_DIR="%PATH_T2_I%"
+set DEST_DIR="%PATH_T1_I%"
 
 ROBOCOPY %SOURCE_DIR% %DEST_DIR% *.mqh
 
