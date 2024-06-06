@@ -2805,6 +2805,121 @@ Comment(
 //+------------------------------------------------------------------+
 //| End of Dashboard - Comment Version                                     
 //+------------------------------------------------------------------+   
+//+------------------------------------------------------------------+
+//| GetTradeFlagCondition                                              
+//+------------------------------------------------------------------+
+bool GetTradeFlagConditionDSS_Trend_RSI(int RSI_Period = 14,
+                                        int SlowMAPeriod = 70,//70 x H1
+                                        int MA_Method = MODE_EMA,        //Method of Moving Average (0=SMA, 1=EMA, 2=SMMA, 3=LWMA)
+                                        string DirectionCheck = "exitbuy") //which direction to check "buy" "sell" "exitbuy" "exitsell"
+  {
+// This function checks trade flag based on hard coded logic and return either false or true
+/*
+June 2024:
+Following trading rules idea to be applied:
+- Trend indicator is applied on the oscillator (RSI) indicator
+- Bullish bias will correspond to RSI oscillator being in the upper part of the 0-100 corridor
+- Bearish bias will correspond to ...                  in the lower side
+- Buy entry when MA on RSI is crossing level 50 from bottom
+- Sell entry when MA on RSI is crossing level 50 from the top
+
+Arbitrary Rules with default parameters:
+Enter Buy:  CrossBelow0MacdLine(MDMainSh1 > MDSnglSh1 && MDMainSh2 < MDSnglSh2 && 
+                                MDMainSh1 < 0 && MDMainSh2 < 0)
+            BarAboveEMA200(iLw > SlowMA1)
+
+Exit Buy:   CrossAbove0MacdLine(MDMainSh1 < MDSnglSh1 && MDMainSh2 > MDSnglSh2 && 
+                                MDMainSh1 > 0 && MDMainSh2 > 0)
+
+Enter Sell: CrossAbove0MacdLine(MDMainSh1 < MDSnglSh1 && MDMainSh2 > MDSnglSh2 && 
+                                MDMainSh1 > 0 && MDMainSh2 > 0)
+            BarBelowEMA200(iHg < SlowMA1)
+
+Exit Sell:  CrossBelow0MacdLine(MDMainSh1 > MDSnglSh1 && MDMainSh2 < MDSnglSh2 && 
+                                MDMainSh1 < 0 && MDMainSh2 < 0)
+
+*/
+   // Define function variables
+   bool result=False;
+   double RSI_Values[];
+   double MA_Values[];
+   // Initialize arrays
+       int barsToProcess = Bars - IndicatorCounted();
+
+    // Adjust the limit based on the RSI and MA periods
+    int limit = RSI_Period + SlowMAPeriod;
+    if (barsToProcess > limit)
+        barsToProcess = limit;
+        
+    // Resize arrays based on the number of bars to process
+    ArrayResize(RSI_Values, barsToProcess);
+    ArrayResize(MA_Values, barsToProcess);
+    //ArraySetAsSeries(RSI_Values, true);
+    //ArraySetAsSeries(MA_Values, true);
+    
+   
+    // Calculate RSI values
+    for (int i = 0; i < barsToProcess; i++)
+    {
+        RSI_Values[i] = iRSI(NULL, 0, RSI_Period, PRICE_CLOSE, i);
+    }
+
+    // Calculate Moving Average of RSI values
+    for (int i = 0; i < barsToProcess; i++)
+    {
+        MA_Values[i] = iMAOnArray(RSI_Values, 0, SlowMAPeriod, 0, MA_Method, i);
+    }
+    
+  if(barsToProcess > 1)
+  {
+     
+    
+    // Check for MA crossing the level of 50
+    double previousMA = MA_Values[1];
+    double currentMA = MA_Values[0];
+    Comment((string)previousMA + "and" + (string)currentMA);
+
+    
+    if (DirectionCheck == "buy" && previousMA < 50 && currentMA > 50)
+    {
+        // MA crossed above 50 - Trigger Buy Signal
+        Print("Buy Signal at ", TimeToString(TimeCurrent(), TIME_DATE|TIME_MINUTES));
+        // Add your buy order logic here
+        result = True; 
+    }
+    else if (DirectionCheck == "sell" && previousMA > 50 && currentMA < 50)
+    {
+        // MA crossed below 50 - Trigger Sell Signal
+        Print("Sell Signal at ", TimeToString(TimeCurrent(), TIME_DATE|TIME_MINUTES));
+        // Add your sell order logic here
+        result = True;
+    }
+    else if (DirectionCheck == "exitbuy" && previousMA > 50 && currentMA < 50)
+    {
+        // MA crossed below 50 - Trigger Sell Signal
+        Print("exitbuy Signal at ", TimeToString(TimeCurrent(), TIME_DATE|TIME_MINUTES));
+        // Add your sell order logic here
+        result = True;
+    } 
+    else if (DirectionCheck == "exitsell" && previousMA < 50 && currentMA > 50)
+    {
+        // MA crossed below 50 - Trigger Sell Signal
+        Print("exitsell Signal at ", TimeToString(TimeCurrent(), TIME_DATE|TIME_MINUTES));
+        // Add your sell order logic here
+        result = True;
+    }   
+  }   
+        
+   return(result);
+
+/* description: 
+   Function will use provided information to decide whether to flag buy or sell condition as true or false
+    
+*/
+  }
+//+------------------------------------------------------------------+
+//| End of GetTradeFlagConditionDSS_Trend_RSI                                                
+//+------------------------------------------------------------------+    
 
 //+------------------------------------------------------------------+
 //| GetTradeFlagCondition                                              
