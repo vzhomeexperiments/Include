@@ -3033,8 +3033,8 @@ Exit Sell:   AO shows 3 green bars
    double StSnglSh2 = iStochastic(Symbol(), Period(), 7, 3, 3, MODE_SMA, 0, MODE_SIGNAL, 2);
    
    //Use 'states' to decide entries/close of trades
-   if((DirectionCheck == "buy") && (st6 || st7 || st8 || st9) && (StMainSh1 > StSnglSh1) && (StMainSh2 < StSnglSh2) && (StMainSh1 < 20) && (Bull)) result = True; 
-   else if((DirectionCheck == "sell") && (st1 || st2 || st3 || st4) && (StMainSh1 < StSnglSh1) && (StMainSh2 > StSnglSh2) && (StMainSh1 > 80) && (Bear)) result = True;
+   if((DirectionCheck == "buy") && (st7 || st8 || st9 || st10) && (StMainSh1 > StSnglSh1) && (StMainSh2 < StSnglSh2) && (StMainSh1 < 20) && (Bull)) result = True; 
+   else if((DirectionCheck == "sell") && (st2 || st3 || st4 || st5) && (StMainSh1 < StSnglSh1) && (StMainSh2 > StSnglSh2) && (StMainSh1 > 80) && (Bear)) result = True;
    else if((DirectionCheck == "exitbuy") && (st4 || st5)) result = True;  //(st4 || st5)) result = True;
    else if((DirectionCheck == "exitsell") && (st9 || st10)) result = True; //(st9 || st10)) result = True;
       
