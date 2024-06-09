@@ -2689,7 +2689,7 @@ Comment(
 //+------------------------------------------------------------------+   
 
 //+------------------------------------------------------------------+
-//| GetTradeFlagCondition                                              
+//| GetTradeFlagCondition    #strategy57                                          
 //+------------------------------------------------------------------+
 bool GetTradeFlagConditionDSS_Trend(int SlowMAPeriod,//200 x H1
                                    string DirectionCheck) //which direction to check "buy" "sell" "exitbuy" "exitsell"
@@ -2806,7 +2806,7 @@ Comment(
 //| End of Dashboard - Comment Version                                     
 //+------------------------------------------------------------------+   
 //+------------------------------------------------------------------+
-//| GetTradeFlagCondition                                              
+//| GetTradeFlagCondition      //#strategy58                                        
 //+------------------------------------------------------------------+
 bool GetTradeFlagConditionDSS_Trend_RSI(int RSI_Period = 14,
                                         int SlowMAPeriod = 70,//70 x H1
@@ -2922,7 +2922,7 @@ Exit Sell:  CrossBelow0MacdLine(MDMainSh1 > MDSnglSh1 && MDMainSh2 < MDSnglSh2 &
 //+------------------------------------------------------------------+    
 
 //+------------------------------------------------------------------+
-//| GetTradeFlagCondition                                              
+//| GetTradeFlagCondition   //#strategy46                                           
 //+------------------------------------------------------------------+
 bool GetTradeFlagConditionDSS_Rule(int FastMAPeriod, //14 x M15
                                    int SlowMAPeriod,//150 x M15
@@ -2992,7 +2992,7 @@ void ShowDashboardDSS_Rule(string Descr0, int magic,
 // Purpose: This function creates a dashboard showing information on your EA using comments function
 // Type: Customisable 
 // Modify this function to suit your trading robot
-//----
+//---- //#strategy46
 /*
 Conversion of Market Types
 if(res == "0" || res == "-1") {marketType = MARKET_NONE; return(marketType); }
@@ -3571,11 +3571,12 @@ Comment(
 //| ReadMarketFromIND                                              
 //+------------------------------------------------------------------+
 /*
+//#strategy46
 User guide:
 1. Add global bool variable to EA: e.g.:                     int     MyMarketType;
-2. Add function call inside start function to EA: e.g.: MyMarketType = ReadMarketFromCSV(Symbol());
+2. Add function call inside start function to EA: e.g.: MyMarketType = ReadMarketFromIND(Symbol());
 3. Adapt Trading Robot conditions to change trading strategy parameters eg.: see Falcon_C
-4. Add include call to this file  to EAe.g.:            #include <096_ReadMarketTypeFromCSV.mqh>
+4. Add include call to this file  to EAe.g.:            #include <DSS_Functions.mqh>
 */
 
 
