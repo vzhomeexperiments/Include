@@ -124,3 +124,44 @@ FileClose(handle);        //close file when data write is over
 
 
 }
+
+
+
+/*
+
+example parameters from DSS_Bot_Rule
+
+# This is a typical log for the #Strategy77 - Supply and Demand
+
+
+// int FastMAPer - variable for a Num bars pattern (4 or 5)
+// int RSIPer - variable for a pattern size in pips (15-20-25)
+// int KeltnerPer - variable for a FVG size in pips (3-5-7)
+extern double  VolBasedSLMultiplier             = 8; // Stop Loss Amount in units of Volatility
+extern double  VolBasedTPMultiplier             = 8; // Take Profit Amount in units of Volatility
+
+*/
+void LogParametersS77(int magic, int order, datetime ordopentime,
+                   int par1, int par2,int par3,
+                   double par4, double par5)
+{
+/*
+- Function creates the file eg: ParemeterLog8177201.csv
+- File will contain Order Number, Magic Number and parameters
+*/
+   
+string fileName = "ParameterLog"+string(magic)+".csv";
+// open file handle
+int handle = FileOpen(fileName,FILE_CSV|FILE_READ|FILE_WRITE);   
+             FileSeek(handle,0,SEEK_END);
+string data = string(magic) + "," + string(order) + "," + string(ordopentime)
++ "," + string(par1)
++ "," + string(par2)
++ "," + string(par3)
++ "," + string(par4)
++ "," + string(par5);
+FileWrite(handle,data);   //write data to the file during each for loop iteration
+FileClose(handle);        //close file when data write is over
+
+
+}

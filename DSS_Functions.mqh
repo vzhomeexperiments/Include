@@ -427,13 +427,12 @@ bool IsMaxPositionsReached(int MaxPositions,int Magic,bool Journaling)
 // This function checks the number of positions we are holding against the maximum allowed 
 
    bool result=False;
-   if(CountPosOrders(Magic,OP_BUY)+CountPosOrders(Magic,OP_SELL)>MaxPositions) 
+   if(CountPosOrders(Magic,OP_BUY)+CountPosOrders(Magic,OP_SELL)+
+      CountPosOrders(Magic, OP_BUYLIMIT)+CountPosOrders(Magic, OP_SELLLIMIT)>=MaxPositions)
      {
       result=True;
       if(Journaling)Print("Max Orders Exceeded");
-        } else if(CountPosOrders(Magic,OP_BUY)+CountPosOrders(Magic,OP_SELL)==MaxPositions) {
-      result=True;
-     }
+     } 
 
    return(result);
 
@@ -945,7 +944,7 @@ double VolBasedStopLoss(bool isVolatilitySwitchOn,double fixedStop,double VolATR
 // Type: Fixed Template 
 // Do not edit unless you know what you're doing
 
-// This function calculates stop loss amount based on volatility
+// This function calculates stop loss amount (in pips) based on volatility
 
    double StopL;
    if(!isVolatilitySwitchOn)
@@ -968,7 +967,7 @@ double VolBasedTakeProfit(bool isVolatilitySwitchOn,double fixedTP,double VolATR
 // Type: Fixed Template 
 // Do not edit unless you know what you're doing
 
-// This function calculates take profit amount based on volatility
+// This function calculates take profit amount (in pips) based on volatility
 
    double TakeP;
    if(!isVolatilitySwitchOn)
@@ -2811,7 +2810,8 @@ Comment(
 bool GetTradeFlagConditionDSS_Trend_RSI(int RSI_Period = 14,
                                         int SlowMAPeriod = 70,//70 x H1
                                         int MA_Method = MODE_EMA,        //Method of Moving Average (0=SMA, 1=EMA, 2=SMMA, 3=LWMA)
-                                        string DirectionCheck = "exitbuy") //which direction to check "buy" "sell" "exitbuy" "exitsell"
+                                        string DirectionCheck = "exitbuy", //which direction to check "buy" "sell" "exitbuy" "exitsell"
+                                        int MT = 5)         // market type
   {
 // This function checks trade flag based on hard coded logic and return either false or true
 /*
@@ -2823,26 +2823,19 @@ Following trading rules idea to be applied:
 - Buy entry when MA on RSI is crossing level 50 from bottom
 - Sell entry when MA on RSI is crossing level 50 from the top
 
-Arbitrary Rules with default parameters:
-Enter Buy:  CrossBelow0MacdLine(MDMainSh1 > MDSnglSh1 && MDMainSh2 < MDSnglSh2 && 
-                                MDMainSh1 < 0 && MDMainSh2 < 0)
-            BarAboveEMA200(iLw > SlowMA1)
-
-Exit Buy:   CrossAbove0MacdLine(MDMainSh1 < MDSnglSh1 && MDMainSh2 > MDSnglSh2 && 
-                                MDMainSh1 > 0 && MDMainSh2 > 0)
-
-Enter Sell: CrossAbove0MacdLine(MDMainSh1 < MDSnglSh1 && MDMainSh2 > MDSnglSh2 && 
-                                MDMainSh1 > 0 && MDMainSh2 > 0)
-            BarBelowEMA200(iHg < SlowMA1)
-
-Exit Sell:  CrossBelow0MacdLine(MDMainSh1 > MDSnglSh1 && MDMainSh2 < MDSnglSh2 && 
-                                MDMainSh1 < 0 && MDMainSh2 < 0)
+Sept 2024:
+Added market type, disable by setting MT variable to '5'
 
 */
    // Define function variables
    bool result=False;
    double RSI_Values[];
    double MA_Values[];
+   bool Bull = False;
+   bool Bear = False;
+   
+   if( (MT == 3) || (MT == 4) || (MT == 5) || (MT == 6)) Bear = True;
+   if( (MT == 1) || (MT == 2) || (MT == 5) || (MT == 6) ) Bull = True;
    // Initialize arrays
        int barsToProcess = Bars - IndicatorCounted();
 
@@ -2880,14 +2873,14 @@ Exit Sell:  CrossBelow0MacdLine(MDMainSh1 > MDSnglSh1 && MDMainSh2 < MDSnglSh2 &
     Comment((string)previousMA + "and" + (string)currentMA);
 
     
-    if (DirectionCheck == "buy" && previousMA < 50 && currentMA > 50)
+    if (DirectionCheck == "buy" && previousMA < 50 && currentMA > 50 && Bull)
     {
         // MA crossed above 50 - Trigger Buy Signal
         Print("Buy Signal at ", TimeToString(TimeCurrent(), TIME_DATE|TIME_MINUTES));
         // Add your buy order logic here
         result = True; 
     }
-    else if (DirectionCheck == "sell" && previousMA > 50 && currentMA < 50)
+    else if (DirectionCheck == "sell" && previousMA > 50 && currentMA < 50 && Bear)
     {
         // MA crossed below 50 - Trigger Sell Signal
         Print("Sell Signal at ", TimeToString(TimeCurrent(), TIME_DATE|TIME_MINUTES));
@@ -2973,8 +2966,260 @@ Exit Sell:   FastMA1 < SlowMA1 && Ask < KeltnerLower1  && StMainSh1 < 20
   }
 //+------------------------------------------------------------------+
 //| End of GetTradeFlagCondition                                                
-//+------------------------------------------------------------------+    
+//+------------------------------------------------------------------+
 
+//+------------------------------------------------------------------+
+//| Detect Supply Demand Buy or Sell Pattern #strategy77
+//+------------------------------------------------------------------+        
+bool DetectSDPattern(bool isBuy, int numBarsPattern = 4, int startBarSearch = 1, int numBarSearch = 10, int minCountFVG = 1,
+                     int movePipsValue = 15, int fvgPipsValue = 5, int K = 10,
+                     int marketType = 0) {
+// function to detect Supply and Demand pattern
+/*
+ @purpose: track last bars and return true if specific pattern was detected
+ @param: 
+ 
+ bool isBuy - flag to search for buy pattern, use !isBuy for searching sell patterns
+ int numBarsPattern = 4 - specify number of consecutive full bars that must be in the pattern
+ int startBarSearch = 1 - specify the index from where should the pattern be searched (current bar is 0)
+ int numBarSearch = 10 - specify number of bars until where the pattern shall be searched
+ int minCountFVG = 1 - specify number of bars where Fair Value Gap condition is true
+ int movePipsValue = 15 - specify total move size (in pips)
+ int fvgPipsValue = 5 - specify size of the FVG in pips
+ int K - point value
+ 
+ @description:
+ function will look for the pattern and will return true if the strong supply or demand pattern will be detected
+
+*/                     
+    int countBuy = 0;
+    int countSell = 0;
+    int countFVG = 0;
+    double totalPips = 0;
+    double smCandlePips1 = 0;
+    double smCandlePips2 = 0;
+    double smCandlePips3 = 0;
+    double valFVG = 0;
+    int i = 1;
+    bool isMarketType = false;
+    
+    K = GetP(); 
+    //Print("P", K); // 10
+    //Print("Point value = ", Point); 0.00001
+    
+    // Loop through the last few bars to find the pattern
+    for (i = startBarSearch; i <= startBarSearch+ numBarSearch; i++) {
+        double openPrice = iOpen(NULL, 0, i);
+        double closePrice = iClose(NULL, 0, i);
+        double highPrice = iHigh(NULL, 0, i);
+        double lowPrice = iLow(NULL, 0, i);
+        // bars to calculate for unmitigated bars / fair value gaps
+        double openPrice2 = iOpen(NULL, 0, i+2);
+        double closePrice2 = iClose(NULL, 0, i+2);
+        double highPrice2 = iHigh(NULL, 0, i+2);
+        double lowPrice2 = iLow(NULL, 0, i+2);
+        
+        // Check if the candle is full and in the desired BUY direction
+        if (isBuy && (closePrice > openPrice)) {
+            countBuy++;
+            totalPips += MathAbs(closePrice - openPrice) / (K*Point);
+            //count FVG conditions
+            valFVG = (lowPrice - highPrice2) / (K*Point);
+            if(valFVG >= fvgPipsValue)
+              {
+               countFVG++;
+              }
+        // Check if the candle is full and in the desired SELL direction
+        } else if(!isBuy && (closePrice < openPrice)) {
+            countSell++;
+            totalPips += MathAbs(closePrice - openPrice) / (K*Point);
+            //count FVG conditions
+            valFVG = (lowPrice2 - highPrice) / (K*Point);
+            if(valFVG >= fvgPipsValue)
+              {
+               countFVG++;
+              }
+        // Reset counters once there is no condition
+        } else {
+            countBuy = 0;
+            countSell = 0;
+            totalPips = 0;
+            countFVG = 0;
+        }
+
+        // Break if we have found 4 consecutive full candles
+        if ((countBuy >= numBarsPattern)&& (totalPips > movePipsValue)) break;
+        if ((countSell >= numBarsPattern)&& (totalPips > movePipsValue)) break;
+        
+        // Uncomment for debugging
+        /*
+        Print("total Pips ", totalPips,
+              " iteration ", i,
+              " count buy: ", countBuy,
+              " count sell: ", countSell,
+              " count FVG: ", countFVG);
+        */
+    } // end of FOR loop
+    
+    // Check if there is an overall trend respected (using higher timeframe)
+    if(marketType == 0)
+      {
+       isMarketType = false;
+      } else if(marketType == 1 && isBuy)
+               {
+                isMarketType = true;
+               } else if(marketType == 3 && !isBuy)
+                        {
+                         isMarketType = true;
+                        } else if(marketType == 5)
+                                 {
+                                  isMarketType = true;
+                                 } else
+                                     {
+                                      isMarketType = false;
+                                     }
+
+    // Check if the pattern of 4 candles satisfies the total pips condition
+    // At the same time, check the market type
+            if ((isBuy && isMarketType && (countFVG >= minCountFVG) && (totalPips >= movePipsValue)) || 
+                (!isBuy && isMarketType && (countFVG >= minCountFVG) && (totalPips >= movePipsValue))) {
+                return true;
+            }
+  
+    return false;
+}
+//+------------------------------------------------------------------+
+//| End of Detect Supply Demand Pattern
+//+------------------------------------------------------------------+ 
+//+------------------------------------------------------------------+
+//| GetTradeFlagConditionDSS_SD                                              
+//+------------------------------------------------------------------+
+
+double GetLevels_SD(bool isSDBuy, bool isSDSell, int numBarsPattern, int startBarSearch, string levelType, int K) 
+  {
+// This function returns order price levels for a supply and demand pattern
+/*
+#strategy77
+
+Function logic:
+- search for a size of the bar right before the SD pattern
+- return suggested price levels for opening a pending order
+
+@param 
+   isSDBuy/isSDSell - boolean flag detection
+   numBarsPattern - number of bars where the pattern starting up (used to identify previous bar)
+   startBarSearch - number of bars to skip before search, default 1
+   levelType - type of level to return ("Entry", "TP", "SL")
+
+@Detail:
+Scroll back to the pattern and detect the bar we need
+Identify such bar and make the order levels
+
+@Usage:
+Specify flags and type of the level, function will return price levels to use
+Test function in the script before use in EA
+
+
+*/
+// Function Variables
+   double result = 0;
+   int i = startBarSearch;
+   double openPrice = 0;
+   double closePrice = 0;
+   double highPrice = 0;
+   double lowPrice = 0;
+/*   
+   Function key logic
+
+
+   Search for the opposite direction bar before the pattern
+
+*/
+
+
+// Function decision criteria
+if(!isSDBuy && !isSDSell) //exit fast if there is no condition found
+  {
+   result = 0;
+   return(result);
+  } else if(isSDBuy)
+           {
+            // scroll through the 'next' bars (right before the pattern) to find the first bar of opposite direction
+            for(i=startBarSearch; i <= startBarSearch + numBarsPattern+3; i++)
+              {
+               openPrice = iOpen(NULL, 0, i);
+               closePrice = iClose(NULL, 0, i);
+               highPrice = iHigh(NULL, 0, i);
+               lowPrice = iLow(NULL, 0, i);
+               
+                  // checking for the 'bearish' bar...
+               if(openPrice > closePrice && levelType == "Entry")
+                 {
+                  result = lowPrice;
+                  return(result);
+                                
+                 } else if(openPrice > closePrice && levelType == "TP")
+                          {
+                           result = iClose(NULL, 0, startBarSearch);
+                           return(result);
+                          } else if(openPrice > closePrice && levelType == "SL")
+                                   {
+                                    result = highPrice + 5 * K * Point;
+                                    return(result);
+                                   }
+               
+               
+               
+              } // end of for loop
+            
+              
+           } else if(isSDSell)
+                    {
+                        // scroll through the 'next' bars (right before the pattern) to find the first bar of opposite direction
+                        for(i=startBarSearch; i <= startBarSearch + numBarsPattern+3; i++)
+                          {
+                           openPrice = iOpen(NULL, 0, i);
+                           closePrice = iClose(NULL, 0, i);
+                           highPrice = iHigh(NULL, 0, i);
+                           lowPrice = iLow(NULL, 0, i);
+                           
+                             //checking for the 'bullish' bar
+                             if(openPrice < closePrice && levelType == "Entry")
+                             {
+                              result = highPrice;
+                              return(result);
+                                            
+                             } else if(openPrice < closePrice && levelType == "TP")
+                                      {
+                                       result = iClose(NULL, 0, startBarSearch);
+                                       return(result);         
+                                      } else if(openPrice < closePrice && levelType == "SL")
+                                               {
+                                                result = lowPrice - 5 * K * Point;
+                                                return(result);
+                                               }
+                             
+                             
+                             
+                          }
+                        
+                        
+                    }
+               
+
+
+   return(result);
+
+/* description: 
+   Function will return levels required to open a pending order
+   #strategy77
+    
+*/
+  }
+ 
+//+------------------------------------------------------------------+
+//| End of GetTradeFlagConditionDSS_SD                                                
+//+------------------------------------------------------------------+    
    
 //+------------------------------------------------------------------+
 //| Dashboard - Comment Version                                    
